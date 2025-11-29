@@ -44,9 +44,9 @@ export function SignUpForm() {
   };
 
   return (
-    <Card className="mx-auto max-w-sm">
+    <Card className="mx-auto max-w-sm font-montserrat rounded-[10px] box-content p-6">
       <CardHeader>
-        <CardTitle className="text-xl">Sign Up</CardTitle>
+        <CardTitle className="text-xl text-[#0D3311] font-electrolize">Sign Up</CardTitle>
         <CardDescription>
           Enter your information to create an account
         </CardDescription>
@@ -171,7 +171,7 @@ export function SignUpForm() {
             </Button>
           </div>
         </form>
-        <div className="mt-4 text-center text-sm">
+        <div className="mt-4 text-center text-xs text-[#0D3311] font-electrolize">
           Already have an account?{" "}
           <Link href="/login" className="underline">
             Sign in

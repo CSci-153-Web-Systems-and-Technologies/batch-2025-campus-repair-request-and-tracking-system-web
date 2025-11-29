@@ -10,7 +10,7 @@ const SignUpPage = () => {
         <img
           src="/images/cover.png"
           alt="Background"
-          className="h-1/2 w-auto object-contain opacity-100"
+          className="h-[630px] w-auto object-contain opacity-100"
         />
       </div>
 
