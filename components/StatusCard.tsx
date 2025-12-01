@@ -25,16 +25,16 @@
     const [imageError, setImageError] = useState(false);
 
     return (
-        <div className="relative w-80 h-24">
-        <div className={` left-0 top-0 w-80 h-20 ${bgColor} rounded-2xl border ${borderColor}`}></div>
+        <div className="relative ml-1 mt-5 h-20">
+        <div className={` left-0 top-0 w-65 h-20 ${bgColor} rounded-2xl border ${borderColor}`}></div>
         
         {/* Status */}
-        <div className={`absolute left-[30px] top-[5px] ${textColor} text-base font-normal font-montserrat leading-9 tracking-wide`}>
+        <div className={`absolute left-[30px] top-[1px] ${textColor} text-sm font-normal font-montserrat leading-9 tracking-wide`}>
             {status}
         </div>
         
         {/* Count */}
-        <div className={`absolute left-[26px] top-[35px] ${textColor} text-5xl font-normal font-electrolize leading-9 tracking-wider`}>
+        <div className={`absolute left-[26px] top-[35px] ${textColor} text-4xl font-normal font-electrolize leading-9 tracking-wider`}>
             {count}
         </div>
         

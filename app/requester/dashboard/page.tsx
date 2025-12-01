@@ -2,6 +2,7 @@
     import Header from '@/components/Header';
     import StatusCard from '@/components/StatusCard';
     import { statusCardsData } from '@/data/statusCards';
+    import SubmitRequestCard from '@/components/SubmitRequestCard';
 
     export default function RequesterDashboard() {
     return (
@@ -18,6 +19,9 @@
                 iconAlt={card.iconAlt}
             />
             ))}
+        </div>
+        <div className="mx-4 sm:mx-6 lg:mx-8 mb-6 sm:mb-8 lg:mb-10">
+            <SubmitRequestCard />
         </div>
         </div>
         </div>
