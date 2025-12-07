@@ -2,7 +2,6 @@
     import React from "react";
     import RequestsCard from "@/components/RequestsCard";
 
-    // Define a type for each request
     interface RequestData {
     title: string;
     location: string;
