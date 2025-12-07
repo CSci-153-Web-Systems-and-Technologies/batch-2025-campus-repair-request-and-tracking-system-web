@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import RepairRequestFormFields from "@/components/RepairRequestFormFields";
+import Header from "@/components/Header";
 
 const FORM_INITIAL_STATE = {
 dateFiled: "",
@@ -192,6 +193,7 @@ const messageStyles = getMessageStyles();
 
 return (
     <div>
+    <Header userName="Angielyn" />
         
     <div className="min-h-screen p-4 md:p-8 pt-6">
         <div className="w-full border border-lime-950 font-xs font-montserrat rounded-lg bg-white p-4 md:p-6 shadow-sm">
