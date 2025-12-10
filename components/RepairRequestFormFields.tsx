@@ -22,6 +22,7 @@ interface FormFieldsProps {
     handleCancel: () => void;
     handleSubmit: (e: React.FormEvent) => void;
     loading: boolean;
+    categories?: { id: string; name: string }[];
 }
 
 interface InputFieldConfig {
@@ -37,20 +38,8 @@ const INPUT_FIELDS: InputFieldConfig[] = [
     { name: "department", label: "Building / Department", placeholder: "Enter department" },
     { name: "designation", label: "Designation / Position", placeholder: "Enter designation" },
     { name: "location", label: "Location", placeholder: "Enter location" },
-    { name: "contactInfo", label: "Contact Number / Email", placeholder: "Contact info", type: "tel" },
+    { name: "contactInfo", label: "Contact Number / Email", placeholder: "Contact info" },
 ];
-
-const WORK_NATURE_OPTIONS = [
-    "Vehicle Repair",
-    "Welding Works",
-    "Mechanical",
-    "Electrical Works",
-    "Carpentry",
-    "Masonry",
-    "Plumbing",
-    "Painting",
-    "Others (please specify)"
-] as const;
 
 const PHOTO_UPLOAD_SLOTS = [0, 1, 2] as const;
 
@@ -80,9 +69,13 @@ export default function RepairRequestFormFields({
     handleCancel,
     handleSubmit,
     loading,
+    categories = [],
 }: FormFieldsProps) {
 
-    const isOthersSelected = formData.workNature.includes("Others (please specify)");
+    const isOthersSelected = formData.workNature.some(id => {
+        const cat = categories.find(c => c.id === id);
+        return cat?.name.toLowerCase().includes('others');
+    });
 
     return (
         <form onSubmit={handleSubmit}>
@@ -111,21 +104,25 @@ export default function RepairRequestFormFields({
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
-                    {WORK_NATURE_OPTIONS.map((work) => (
-                        <div key={work} className="flex items-center p-2 hover:bg-gray-50 rounded">
-                            <input
-                                type="checkbox"
-                                id={`work-${work}`}
-                                name="work-nature"
-                                checked={formData.workNature.includes(work)}
-                                onChange={() => handleCheckboxChange(work)}
-                                className="h-4 w-4 text-lime-700 border-neutral-400 rounded focus:ring-lime-300"
-                            />
-                            <label htmlFor={`work-${work}`} className="ml-2 text-sm text-neutral-700 cursor-pointer">
-                                {work}
-                            </label>
-                        </div>
-                    ))}
+                    {categories.length > 0 ? (
+                        categories.map((category) => (
+                            <div key={category.id} className="flex items-center p-2 hover:bg-gray-50 rounded">
+                                <input
+                                    type="checkbox"
+                                    id={`work-${category.id}`}
+                                    name="work-nature"
+                                    checked={formData.workNature.includes(category.id)}
+                                    onChange={() => handleCheckboxChange(category.id)}
+                                    className="h-4 w-4 text-lime-700 border-neutral-400 rounded focus:ring-lime-300"
+                                />
+                                <label htmlFor={`work-${category.id}`} className="ml-2 text-sm text-neutral-700 cursor-pointer">
+                                    {category.name}
+                                </label>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-gray-500 text-sm">Loading categories...</p>
+                    )}
                 </div>
 \
                 <textarea
