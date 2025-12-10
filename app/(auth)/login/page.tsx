@@ -3,8 +3,6 @@ import { LoginForm } from './components/LoginForm'
 
 const LoginPage = () => {
   return (
-    <div>
-
     <div className="relative min-h-screen bg-white flex items-center justify-center">
       <div className="absolute inset-0 flex items-center justify-center z-0">
         <img
@@ -32,7 +30,6 @@ const LoginPage = () => {
       <div className="relative z-10">
         <LoginForm/>
       </div>
-    </div>
     </div>
   )
 }

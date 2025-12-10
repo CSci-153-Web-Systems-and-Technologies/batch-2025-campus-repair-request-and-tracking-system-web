@@ -1,8 +1,6 @@
-    'use client';
+'use client';
 
-    import React, { useState } from 'react';
-    import Image from 'next/image';
-
+import React, { useState } from 'react';
     export interface StatusCardProps {
     count: number;
     status: string;

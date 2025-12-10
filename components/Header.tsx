@@ -1,3 +1,5 @@
+"use client";
+
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
     interface HeaderProps {

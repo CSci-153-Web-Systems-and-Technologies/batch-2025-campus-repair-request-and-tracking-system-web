@@ -13,68 +13,77 @@ export async function login(formData: FormData) {
     password: formData.get("password") as string,
   };
 
-  const { error } = await supabase.auth.signInWithPassword(data);
+  const { data: authData, error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
     return { error: `Login failed: ${error.message}` };
   }
 
+  // Verify user has a profile in the database
+  if (authData?.user) {
+    const { data: profile, error: profileError } = await supabase
+      .from('profile')
+      .select('id')
+      .eq('id', authData.user.id)
+      .single();
+
+    if (profileError || !profile) {
+      await supabase.auth.signOut();
+      return { error: "User profile not found. Please contact support." };
+    }
+  }
+
   revalidatePath("/", "layout");
-  redirect("/");
+  redirect("/requester/dashboard");
 }
 
 export async function signup(formData: FormData) {
   const supabase = createClient();
 
-  try {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-    if (!email || !password) {
-      return { error: "Email and password are required" };
-    }
+  if (!email || !password) {
+    return { error: "Email and password are required" };
+  }
 
-    if (password.length < 6) {
-      return { error: "Password must be at least 6 characters" };
-    }
+  if (password.length < 6) {
+    return { error: "Password must be at least 6 characters" };
+  }
 
-    const { data: authData, error } = await supabase.auth.signUp({
-      email,
-      password,
+  const { data: authData, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
+  if (error) {
+    console.error('Signup failed:', error);
+    return { error: `Authentication failed: ${error.message}` };
+  }
+
+  if (!authData?.user) {
+    return { error: "No user data received" };
+  }
+
+  const { error: profileError } = await supabase
+    .from('profile')
+    .insert({
+      id: authData.user.id,
+      full_name: `${formData.get("first-name")} ${formData.get("last-name")}`,
+      email_address: email,
+      role: formData.get("role") as string,
+      department: formData.get("department") as string,
+      contact_number: formData.get("contact_number") as string,
+      designation: formData.get("designation") as string,
     });
 
-    if (error) {
-      console.error('Signup failed:', error);
-      return { error: `Authentication failed: ${error.message}` };
-    }
-
-    if (!authData?.user) {
-      return { error: "No user data received" };
-    }
-
-    const { error: profileError } = await supabase
-      .from('profile')
-      .insert({
-        id: authData.user.id,
-        full_name: `${formData.get("first-name")} ${formData.get("last-name")}`,
-        email_address: email,
-        role: formData.get("role") as string,
-        department: formData.get("department") as string,
-        contact_number: formData.get("contact_number") as string,
-        designation: formData.get("designation") as string,
-      });
-
-    if (profileError) {
-      console.error('Profile creation failed:', profileError);
-      return { error: `Profile creation failed: ${profileError.message}` };
-    }
-
-    revalidatePath("/", "layout");
-    return { success: true, message: "Account created successfully!" };
-    
-  } catch (error: any) {
-    return { error: `Unexpected error: ${error.message}` };
+  if (profileError) {
+    console.error('Profile creation failed:', profileError);
+    return { error: `Profile creation failed: ${profileError.message}` };
   }
+
+  revalidatePath("/", "layout");
+  redirect("/requester/dashboard");
 }
 
 export async function signout() {
