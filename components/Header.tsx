@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
+import { signout } from "@/lib/auth-actions";
     interface HeaderProps {
     userName?: string;
     }
@@ -9,8 +9,7 @@ import { createClient } from "@/utils/supabase/client";
     export default function Header({ userName = "Angielyn" }: HeaderProps) {
         const router = useRouter();
         const handleSignOut = async () => {
-
-        await createClient().auth.signOut();
+            await signout();
         }
     return (
         <header className="bg-white shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
@@ -34,7 +33,7 @@ import { createClient } from "@/utils/supabase/client";
                 </div>
             </div>
             <div className="flex items-center justify-end sm:justify-center sm:w-auto">
-                <button className="group relative sm:w-auto min-w-[140px] sm:min-w-[120px] h-8 sm:h-8 bg-neutral-100 rounded-[5px] border border-stone-400 hover:bg-neutral-200 transition-colors flex items-center justify-center space-x-2 px-2 py-2">
+                <button onClick={handleSignOut} className="group relative sm:w-auto min-w-[140px] sm:min-w-[120px] h-8 sm:h-8 bg-neutral-100 rounded-[5px] border border-stone-400 hover:bg-neutral-200 transition-colors flex items-center justify-center space-x-2 px-2 py-2">
                 <div className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 flex-shrink-0">
                     <img src="/images/signout.png" alt="Sign Out Icon" />
                 </div>
