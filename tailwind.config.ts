@@ -18,6 +18,11 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        montserrat: ['var(--font-montserrat)', 'sans-serif'],
+        electrolize: ['var(--font-electrolize)', 'sans-serif'],
+        sans: ['var(--font-montserrat)', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

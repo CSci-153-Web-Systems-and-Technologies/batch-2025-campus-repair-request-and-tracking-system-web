@@ -1,5 +1,4 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { signout } from "@/lib/auth-actions";
     interface HeaderProps {
