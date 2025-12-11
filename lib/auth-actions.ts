@@ -19,11 +19,11 @@ export async function login(formData: FormData) {
     return { error: `Login failed: ${error.message}` };
   }
 
-  // Verify user has a profile in the database
+  // Verify user has a profile in the database and determine role
   if (authData?.user) {
     const { data: profile, error: profileError } = await supabase
       .from('profile')
-      .select('id')
+      .select('id, role')
       .eq('id', authData.user.id)
       .single();
 
@@ -31,10 +31,16 @@ export async function login(formData: FormData) {
       await supabase.auth.signOut();
       return { error: "User profile not found. Please contact support." };
     }
-  }
 
-  revalidatePath("/", "layout");
-  redirect("/requester/dashboard");
+    const role = profile.role?.toLowerCase();
+    if (role !== 'requester' && role !== 'personnel') {
+      await supabase.auth.signOut();
+      return { error: "Invalid role. Please contact support." };
+    }
+
+    revalidatePath("/", "layout");
+    redirect(role === 'personnel' ? "/personnel/dashboard" : "/requester/dashboard");
+  }
 }
 
 export async function signup(formData: FormData) {
@@ -49,6 +55,12 @@ export async function signup(formData: FormData) {
 
   if (password.length < 6) {
     return { error: "Password must be at least 6 characters" };
+  }
+
+  const role = (formData.get("role") as string)?.toLowerCase();
+  const allowedRoles = ["requester", "personnel"];
+  if (!role || !allowedRoles.includes(role)) {
+    return { error: "Role must be requester or personnel" };
   }
 
   const { data: authData, error } = await supabase.auth.signUp({
@@ -71,7 +83,7 @@ export async function signup(formData: FormData) {
       id: authData.user.id,
       full_name: `${formData.get("first-name")} ${formData.get("last-name")}`,
       email_address: email,
-      role: formData.get("role") as string,
+      role,
       department: formData.get("department") as string,
       contact_number: formData.get("contact_number") as string,
       designation: formData.get("designation") as string,
@@ -83,7 +95,7 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/requester/dashboard");
+  redirect(role === 'personnel' ? "/personnel/dashboard" : "/requester/dashboard");
 }
 
 export async function signout() {

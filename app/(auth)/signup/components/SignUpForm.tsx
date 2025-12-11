@@ -112,7 +112,6 @@ export function SignUpForm() {
               >
                 <option value="">Select a role</option>
                 <option value="requester">Requester</option>
-                <option value="clerk">Clerk</option>
                 <option value="personnel">Personnel</option>
               </select>
             </div>
