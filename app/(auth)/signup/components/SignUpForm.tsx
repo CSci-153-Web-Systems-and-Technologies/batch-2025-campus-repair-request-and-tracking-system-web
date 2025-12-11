@@ -1,8 +1,4 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,33 +12,6 @@ import { Label } from "@/components/ui/label";
 import { signup } from "@/lib/auth-actions";
 
 export function SignUpForm() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const router = useRouter();
-
-  const handleSubmit = async (formData: FormData) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const result = await signup(formData);
-      
-      if (result?.error) {
-        setError(result.error);
-      } else if (result?.success) {
-        setSuccess(true);
-        setTimeout(() => {
-          router.push("/");
-        }, 2000);
-      }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <Card className="mx-auto max-w-sm font-montserrat rounded-[10px] box-content p-6">
       <CardHeader>
@@ -52,21 +21,7 @@ export function SignUpForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-800">{error}</p>
-          </div>
-        )}
-        
-        {success && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-            <p className="text-sm text-green-800">
-              Account created successfully! Redirecting...
-            </p>
-          </div>
-        )}
-
-        <form action={handleSubmit}>
+        <form>
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
@@ -164,10 +119,10 @@ export function SignUpForm() {
 
             <Button 
               type="submit" 
+              formAction={signup}
               className="w-full"
-              disabled={isLoading}
             >
-              {isLoading ? "Creating account..." : "Create an account"}
+              Create an account
             </Button>
           </div>
         </form>

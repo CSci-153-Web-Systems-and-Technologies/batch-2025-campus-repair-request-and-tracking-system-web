@@ -1,12 +1,13 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import RepairRequestFormFields from "@/components/RepairRequestFormFields";
+import Header from "@/components/Header";
 
 const FORM_INITIAL_STATE = {
-dateFiled: "",
+dateFiled: new Date().toISOString().split('T')[0],
 requestingParty: "",
 department: "",
 designation: "",
@@ -30,22 +31,60 @@ const router = useRouter();
 const [loading, setLoading] = useState(false);
 const [submitMessage, setSubmitMessage] = useState("");
 const [formData, setFormData] = useState(FORM_INITIAL_STATE);
+const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+
+useEffect(() => {
+    const loadData = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: profile } = await supabase
+        .from('profile')
+        .select('full_name,email_address,contact_number,designation,department')
+        .eq('id', user.id)
+        .single();
+
+    const contactCombined = [profile?.contact_number, profile?.email_address]
+        .filter(Boolean)
+        .join(' / ');
+
+    setFormData(prev => ({
+        ...prev,
+        dateFiled: prev.dateFiled || new Date().toISOString().split('T')[0],
+        requestingParty: profile?.full_name || prev.requestingParty,
+        department: profile?.department || prev.department,
+        designation: profile?.designation || prev.designation,
+        contactInfo: contactCombined || prev.contactInfo,
+    }));
+
+    const { data: categoriesData } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name');
+    
+    if (categoriesData) {
+        setCategories(categoriesData);
+    }
+    };
+
+    loadData();
+}, []);
 
 const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 };
 
-const handleCheckboxChange = (workType: string) => {
+const handleCheckboxChange = (categoryId: string) => {
     setFormData(prev => {
     const currentSelection = [...prev.workNature];
-    const isSelected = currentSelection.includes(workType);
+    const isSelected = currentSelection.includes(categoryId);
         
     if (isSelected) {
-        return { ...prev, workNature: currentSelection.filter(type => type !== workType) };
+        return { ...prev, workNature: currentSelection.filter(id => id !== categoryId) };
     }
         
-    return { ...prev, workNature: [...currentSelection, workType] };
+    return { ...prev, workNature: [...currentSelection, categoryId] };
     });
 };
 
@@ -89,13 +128,13 @@ const uploadPhoto = async (photo: File, userId: string): Promise<string | null> 
     const fileName = `${userId.slice(0, 8)}-${Date.now()}.${fileExt}`;
         
     const { error } = await supabase.storage
-        .from('repair-photos')
+        .from('repair_photos')
         .upload(fileName, photo);
         
     if (error) return null;
         
     const { data: { publicUrl } } = supabase.storage
-        .from('repair-photos')
+        .from('repair_photos')
         .getPublicUrl(fileName);
         
     return publicUrl;
@@ -128,31 +167,29 @@ const handleSubmit = async (e: React.FormEvent) => {
         return;
     }
         
-    alert("Processing your repair request...");
+    let uploadedPhotoUrls: string[] = [];
+    if (formData.photos.length > 0) {
+        const uploadPromises = formData.photos
+            .filter(photo => photo)
+            .map(photo => uploadPhoto(photo, user.id));
+            
+        uploadedPhotoUrls = (await Promise.all(uploadPromises)).filter(Boolean) as string[];
+    }
         
+    const categoryMap = new Map(categories.map(cat => [cat.id, cat.name] as const));
+    const primaryCategoryId = formData.workNature[0];
+    const primaryCategoryName = primaryCategoryId ? categoryMap.get(primaryCategoryId) : undefined;
+
+
     const requestData = {
-        title: formData.workDescription,
-        location: formData.location,
-        description: formData.workDescription,
-        category: formData.workNature.join(', ') || 'other',
+        title: formData.workDescription, 
+        location: formData.location, 
         status: 'submitted',
-        priority: 'medium',
-        requester_id: user.id,
-        img_url: [] as string[],
+        requester_id: user.id, 
+        img_url: uploadedPhotoUrls, 
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
     };
-        
-    if (formData.photos.length > 0) {
-        alert("Uploading photos...");
-            
-        const uploadPromises = formData.photos
-        .filter(photo => photo)
-        .map(photo => uploadPhoto(photo, user.id));
-            
-        const uploadedUrls = (await Promise.all(uploadPromises)).filter(Boolean) as string[];
-        requestData.img_url = uploadedUrls;
-    }
         
     const { data, error } = await supabase
         .from('requests')
@@ -162,12 +199,29 @@ const handleSubmit = async (e: React.FormEvent) => {
     if (error) throw error;
     
     const requestId = data[0]?.id;
-    alert(`Request #${requestId} submitted!\nAssigned to: ${user.email}`);
-    setSubmitMessage(`Request #${requestId} submitted!`);
+
+    if (formData.workNature.length > 0) {
+        const categoryRelations = formData.workNature.map(categoryId => ({
+            request_id: requestId,
+            category_id: categoryId
+        }));
+
+        const { error: catError } = await supabase
+            .from('request_categories')
+            .insert(categoryRelations);
+
+        if (catError) {
+            console.error('Category insertion error:', catError);
+        }
+    }
+    
+    setSubmitMessage(`Request #${requestId} submitted successfully!`);
+    
+    setFormData(FORM_INITIAL_STATE);
         
     setTimeout(() => {
         router.push("/requester/dashboard");
-    }, 2000);
+    }, 1500);
         
     } catch (error: any) {
     console.error("Submission error:", error);
@@ -192,6 +246,7 @@ const messageStyles = getMessageStyles();
 
 return (
     <div>
+    <Header userName="Angielyn" />
         
     <div className="min-h-screen p-4 md:p-8 pt-6">
         <div className="w-full border border-lime-950 font-xs font-montserrat rounded-lg bg-white p-4 md:p-6 shadow-sm">
@@ -217,6 +272,7 @@ return (
             handleCancel={handleCancel}
             handleSubmit={handleSubmit}
             loading={loading}
+            categories={categories}
         />
         </div>
     </div>

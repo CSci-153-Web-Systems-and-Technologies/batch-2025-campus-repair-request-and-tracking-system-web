@@ -1,5 +1,7 @@
-import Link from "next/link"
+"use client";
 
+import Link from "next/link"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -14,6 +16,16 @@ import { login } from "@/lib/auth-actions"
 import SignInWithGoogleButton from "./SignInWithGoogleButton"
 
 export function LoginForm() {
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (formData: FormData) => {
+    setError(null);
+    const result = await login(formData);
+    if (result?.error) {
+      setError(result.error);
+    }
+  };
+
   return (
     <Card className="rounded-[10px] mx-auto max-w-sm box-content p-6 font-montserrat">
       <CardHeader>
@@ -23,7 +35,12 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action="">
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-800">{error}</p>
+          </div>
+        )}
+        <form action={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -44,7 +61,7 @@ export function LoginForm() {
                 </div>
                 <Input id="password" name="password" type="password" required />
               </div>
-              <Button type="submit" formAction={login} className="w-full font-electrolize">
+              <Button type="submit" className="w-full font-electrolize">
                 LOGIN
               </Button>
               <SignInWithGoogleButton/> 

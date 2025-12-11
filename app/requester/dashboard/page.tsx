@@ -1,4 +1,7 @@
+    'use client';
+    
     import React from 'react';
+    import { useRouter } from 'next/navigation';
     import Header from '@/components/Header';
     import StatusCard from '@/components/StatusCard';
     import { statusCardsData } from '@/data/statusCards';
@@ -6,6 +9,12 @@
     import RequestsContainer from '@/components/RequestsContainer';
 
     export default function RequesterDashboard() {
+    const router = useRouter();
+    
+    const handleSubmitRequest = () => {
+        router.push('/requester/request-form');
+    };
+    
     return (
         <div>        
         <Header userName="Angielyn" />
@@ -22,7 +31,7 @@
             ))}
         </div>
         <div className="mx-4 sm:mx-6 lg:mx-8 mb-6 sm:mb-8 lg:mb-10">
-            <SubmitRequestCard />
+            <SubmitRequestCard onClick={handleSubmitRequest} />
         </div>
         <div className="pt-1 flex flex-wrap justify-center">
             <RequestsContainer   />
