@@ -22,12 +22,14 @@ const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
 
   const getStatusStyle = (status: string) => {
     switch (status.toLowerCase()) {
+      case 'completed':
+        return { bg: 'bg-green-100', text: 'text-green-600', icon: '✅' };
+      case 'pending':
+        return { bg: 'bg-yellow-100', text: 'text-orange-600', icon: '⏳' };
       case 'in progress':
         return { bg: 'bg-sky-100', text: 'text-sky-600', icon: '🔨' };
-      case 'pending':
-        return { bg: 'bg-yellow-100', text: 'text-yellow-600', icon: '⏳' };
-      case 'completed':
-        return { bg: 'bg-green-100', text: 'text-green-600', icon: '✓' };
+      case 'cancelled':
+        return { bg: 'bg-red-100', text: 'text-red-600', icon: '❌' };
       default:
         return { bg: 'bg-gray-100', text: 'text-gray-600', icon: '' };
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import RequestRow from "@/components/RequestRow";
 import { createClient } from "@/utils/supabase/client";
 
@@ -13,7 +13,19 @@ interface Request {
     created_at: string;
 }
 
-const RequestContainer2: React.FC = () => {
+interface RequestContainer2Props {
+    search?: string;
+    status?: string;
+    department?: string;
+    category?: string;
+}
+
+const RequestContainer2: React.FC<RequestContainer2Props> = ({
+    search = "",
+    status = "all",
+    department = "all",
+    category = "all",
+}) => {
     const [requests, setRequests] = useState<Request[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -35,6 +47,35 @@ const RequestContainer2: React.FC = () => {
 
     fetchRequests();
     }, []);
+
+    const filteredRequests = useMemo(() => {
+        const query = search.trim().toLowerCase();
+        const statusFilter = status.trim().toLowerCase();
+        const departmentFilter = department.trim().toLowerCase();
+        const categoryFilter = category.trim().toLowerCase();
+
+        return requests.filter((req) => {
+            const matchesQuery = query
+                ? req.title.toLowerCase().includes(query) || req.category.toLowerCase().includes(query) || req.location.toLowerCase().includes(query)
+                : true;
+
+            const matchesStatus = statusFilter && statusFilter !== "all"
+                ? req.status.toLowerCase() === statusFilter
+                : true;
+
+            const matchesDepartment = departmentFilter && departmentFilter !== "all"
+                ? req.location.toLowerCase().includes(departmentFilter)
+                : true;
+
+            const matchesCategory = categoryFilter && categoryFilter !== "all"
+                ? req.category.toLowerCase().includes(categoryFilter)
+                : true;
+
+            return matchesQuery && matchesStatus && matchesDepartment && matchesCategory;
+        });
+    }, [requests, search, status, department, category]);
+
+    const isFiltered = Boolean(search?.trim()) || (status && status !== "all") || (department && department !== "all") || (category && category !== "all");
 
 return (
         <div className="w-full mt-4">
@@ -70,13 +111,15 @@ return (
                     <div className="flex justify-center items-center h-32">
                     <div className="text-lime-950 text-sm">Loading requests...</div>
                     </div>
-                ) : requests.length === 0 ? (
+                ) : filteredRequests.length === 0 ? (
                     <div className="flex justify-center items-center h-32">
-                    <div className="text-lime-950 text-sm">No requests found</div>
+                    <div className="text-lime-950 text-sm">
+                        {isFiltered ? "No matching requests" : "No requests found"}
+                    </div>
                     </div>
                 ) : (
                     <div className="space-y-3">
-                    {requests.map((request) => (
+                    {filteredRequests.map((request) => (
                         <RequestRow key={request.id} request={request} />
                     ))}
                     </div>
