@@ -54,7 +54,7 @@
         <div className="absolute left-0 top-0 w-[788px] h-96 bg-neutral-100 rounded-2xl border border-lime-950" />
         
         {/* Title */}
-        <div className="absolute left-[24.07px] font-electrolize top-[18px] w-40 h-12 text-lime-950 text-base font-semibold font-montserrat leading-9 tracking-wide">
+        <div className="absolute left-[24.07px] font-electrolize top-[18px] w-40 h-12 text-lime-950 text-base font-semibold leading-9 tracking-wide">
             {title}
         </div>
         
