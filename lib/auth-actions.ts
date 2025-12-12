@@ -19,20 +19,54 @@ export async function login(formData: FormData) {
     return { error: `Login failed: ${error.message}` };
   }
 
-  // Verify user has a profile in the database and determine role
   if (authData?.user) {
-    const { data: profile, error: profileError } = await supabase
+    let { data: profile, error: profileError } = await supabase
       .from('profile')
       .select('id, role')
       .eq('id', authData.user.id)
       .single();
 
     if (profileError || !profile) {
-      await supabase.auth.signOut();
-      return { error: "User profile not found. Please contact support." };
+      const { data: pendingProfile } = await supabase
+        .from('pending_profiles')
+        .select('*')
+        .eq('user_id', authData.user.id)
+        .single();
+
+      const profileData = pendingProfile || {
+        full_name: data.email?.split('@')[0] || 'New User',
+        department: '',
+        contact_number: '',
+        designation: '',
+        role: 'requester',
+      };
+
+      const { error: insertError } = await supabase
+        .from('profile')
+        .insert({
+          id: authData.user.id,
+          full_name: profileData.full_name,
+          email_address: data.email,
+          role: profileData.role,
+          department: profileData.department,
+          contact_number: profileData.contact_number,
+          designation: profileData.designation,
+        });
+
+        if (insertError) {
+        console.error('Profile creation failed:', insertError);
+        await supabase.auth.signOut();
+        return { error: `Profile creation failed: ${insertError.message}` };
+      }
+
+      if (pendingProfile) {
+        await supabase.from('pending_profiles').delete().eq('user_id', authData.user.id);
+      }
+
+      profile = { id: authData.user.id, role: profileData.role } as any;
     }
 
-    const role = profile.role?.toLowerCase();
+    const role = (profile as any).role?.toLowerCase();
     if (role !== 'requester' && role !== 'personnel') {
       await supabase.auth.signOut();
       return { error: "Invalid role. Please contact support." };
@@ -48,6 +82,12 @@ export async function signup(formData: FormData) {
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const firstName = formData.get("first-name") as string;
+  const lastName = formData.get("last-name") as string;
+  const department = formData.get("department") as string;
+  const contactNumber = formData.get("contact_number") as string;
+  const designation = formData.get("designation") as string;
+  const role = (formData.get("role") as string)?.toLowerCase();
 
   if (!email || !password) {
     return { error: "Email and password are required" };
@@ -57,7 +97,6 @@ export async function signup(formData: FormData) {
     return { error: "Password must be at least 6 characters" };
   }
 
-  const role = (formData.get("role") as string)?.toLowerCase();
   const allowedRoles = ["requester", "personnel"];
   if (!role || !allowedRoles.includes(role)) {
     return { error: "Role must be requester or personnel" };
@@ -66,6 +105,15 @@ export async function signup(formData: FormData) {
   const { data: authData, error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        full_name: `${firstName} ${lastName}`.trim(),
+        department: department,
+        contact_number: contactNumber,
+        designation: designation,
+        role: role,
+      }
+    }
   });
 
   if (error) {
@@ -77,25 +125,10 @@ export async function signup(formData: FormData) {
     return { error: "No user data received" };
   }
 
-  const { error: profileError } = await supabase
-    .from('profile')
-    .insert({
-      id: authData.user.id,
-      full_name: `${formData.get("first-name")} ${formData.get("last-name")}`,
-      email_address: email,
-      role,
-      department: formData.get("department") as string,
-      contact_number: formData.get("contact_number") as string,
-      designation: formData.get("designation") as string,
-    });
-
-  if (profileError) {
-    console.error('Profile creation failed:', profileError);
-    return { error: `Profile creation failed: ${profileError.message}` };
-  }
-
-  revalidatePath("/", "layout");
-  redirect(role === 'personnel' ? "/personnel/dashboard" : "/requester/dashboard");
+  return {
+    success: true,
+    message: `Account created! Please check your email at ${email} to confirm your account.`,
+  };
 }
 
 export async function signout() {
