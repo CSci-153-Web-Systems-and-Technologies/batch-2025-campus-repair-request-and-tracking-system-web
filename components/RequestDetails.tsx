@@ -1,53 +1,72 @@
-    'use client';
+import React from 'react';
+import { createClient } from '@/utils/supabase/server';
 
-    import React from 'react';
-
-    interface RequestData {
-    title: string;
-    description: string;
-    category: string;
-    status: string;
-    priority: string;
-    createdDate: string;
-    scheduleDate: string;
-    location: string;
-    room: string;
-    requestedBy: string;
-    contact: string;
+interface RequestDetailsProps {
+    requestId: string;
     }
 
-    interface RequestCardProps {
-    data?: RequestData;
+    async function getRequestDetails(requestId: string) {
+    const supabase = createClient();
+    
+    const { data: request, error } = await supabase
+        .from('requests')
+        .select(`
+        *,
+        profile:requester_id (
+            full_name,
+            email_address
+        )
+        `)
+        .eq('id', requestId)
+        .single();
+    
+    if (error || !request) {
+        return null;
+    }
+    
+    return request;
     }
 
-    const defaultData: RequestData = {
-    title: 'Leaking faucet',
-    description: 'Sink faucet in the kitchen cannot be closed',
-    category: 'Plumbing',
-    status: 'In Progress',
-    priority: 'High',
-    createdDate: 'Saturday, 01/03/2023',
-    scheduleDate: 'Sunday, 01/04/2024',
-    location: '2nd Floor Mens Restroom',
-    room: 'DCST - ROOM 101',
-    requestedBy: 'Tom Cruise',
-    contact: 'tom_cruise@university.edu.ph'
+    const RequestDetails = async ({ requestId }: RequestDetailsProps) => {
+    const request = await getRequestDetails(requestId);
+    
+    if (!request) {
+        return (
+        <div className="relative w-[788px] h-96 bg-neutral-100 rounded-2xl border border-lime-950 flex items-center justify-center">
+            <p className="text-red-600 text-sm">Request not found</p>
+        </div>
+        );
+    }
+    
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        month: '2-digit', 
+        day: '2-digit', 
+        year: 'numeric' 
+        });
     };
-
-    const RequestDetails: React.FC<RequestCardProps> = ({ data = defaultData }) => {
-    const {
-        title,
-        description,
-        category,
-        status,
-        priority,
-        createdDate,
-        scheduleDate,
-        location,
-        room,
-        requestedBy,
-        contact
-    } = data;
+    
+    const getStatusStyle = (status: string) => {
+        switch (status?.toLowerCase()) {
+        case 'completed':
+            return { bg: 'bg-green-100', text: 'text-green-600', icon: '✅' };
+        case 'pending':
+            return { bg: 'bg-yellow-100', text: 'text-orange-600', icon: '⏳' };
+        case 'in progress':
+            return { bg: 'bg-sky-100', text: 'text-sky-600', icon: '🔨' };
+        case 'cancelled':
+            return { bg: 'bg-red-100', text: 'text-red-600', icon: '❌' };
+        default:
+            return { bg: 'bg-gray-100', text: 'text-gray-600', icon: '' };
+        }
+    };
+    
+    const statusStyle = getStatusStyle(request.status);
+    const requesterName = request.profile?.full_name || 'Unknown';
+    const requesterEmail = request.profile?.email_address || 'N/A';
 
     return (
         <div className="relative w-[788px] h-96">
@@ -55,39 +74,34 @@
         
         {/* Title */}
         <div className="absolute left-[24.07px] font-electrolize top-[18px] w-40 h-12 text-lime-950 text-base font-semibold leading-9 tracking-wide">
-            {title}
+            {request.title}
         </div>
         
         {/* Description */}
         <div className="text-lime-950 text-base leading-9 tracking-wide absolute left-[24.07px] top-[43px] w-96 ">
-            {description}
+            {request.description || 'No description provided'}
         </div>
         
-        {/* Status */}
-        <div className="absolute left-[24.07px] top-[93px] w-36 h-6 px-5 py-2 bg-sky-100 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-between items-center overflow-hidden">
-            <div className="flex justify-start items-center gap-2">
-            <div className="text-sky-600 text-sm font-semibold font-electrolize leading-5">
-                🔨 {status}
+        {/* Status, Priority, Category - Responsive Container */}
+        <div className="absolute left-[24.07px] top-[93px] flex flex-wrap items-center gap-2 max-w-[740px]">
+            {/* Status */}
+            <div className={`h-6 px-5 py-2 ${statusStyle.bg} rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center border border-black`}>
+            <div className={`${statusStyle.text} text-sm font-semibold font-electrolize leading-5 whitespace-nowrap`}>
+                {statusStyle.icon} {request.status}
             </div>
             </div>
-            <div className="justify-start"></div>
-        </div>
-        
-        {/* Priority */}
-        <div className="absolute left-[189.41px] font-electrolize top-[93px] w-16 h-6 px-5 py-2 bg-red-100 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-between items-center overflow-hidden">
-            <div className="flex justify-start items-center gap-2">
-            <div className="text-red-700 text-sm font-semibold font-inter leading-5">
-                {priority}
+            
+            {/* Priority */}
+            <div className="h-6 px-5 py-2 bg-red-100 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center">
+            <div className="text-red-700 text-sm font-semibold font-electrolize leading-5 whitespace-nowrap">
+                {request.priority || 'Medium'}
             </div>
             </div>
-            <div className="justify-start"></div>
-        </div>
-        
-        {/* Category */}
-        <div className="absolute font-electrolize left-[276.27px] top-[93px] w-24 h-6 px-5 py-2 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-black inline-flex justify-between items-center overflow-hidden">
-            <div className="flex justify-start items-center gap-2">
-            <div className="text-black text-sm font-semibold font-inter leading-5">
-                {category}
+            
+            {/* Category */}
+            <div className="h-6 px-5 py-2 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-black inline-flex justify-center items-center">
+            <div className="text-black text-sm font-semibold font-electrolize leading-5 whitespace-nowrap">
+                {request.category}
             </div>
             </div>
         </div>
@@ -97,7 +111,7 @@
             Created
         </div>
         <div className="absolute left-[53.37px] top-[245px] w-40 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {createdDate}
+            {formatDate(request.created_at)}
         </div>
         <div className="absolute left-[18.98px] top-[240.68px]">
             <img 
@@ -113,7 +127,7 @@
             Schedule of Repair
         </div>
         <div className="absolute left-[54.42px] top-[309px] w-40 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {scheduleDate}
+            {formatDate(request.schedule_date)}
         </div>
         <div className="absolute left-[20.98px] top-[307.75px]">
             <img 
@@ -129,10 +143,10 @@
             Location
         </div>
         <div className="absolute left-[52.32px] top-[181px] w-44 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            {location}
+            {request.building || 'N/A'}
         </div>
         <div className="absolute left-[52.32px] top-[164px] w-36 h-9 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {room}
+            {request.location}
         </div>
         <div className="absolute left-[19.07px] top-[169.72px]">
             <img 
@@ -148,7 +162,7 @@
             Requested by
         </div>
         <div className="absolute left-[440.57px] top-[172px] w-36 h-9 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {requestedBy}
+            {requesterName}
         </div>
         <div className="absolute left-[405.25px] top-[170.75px]">
             <img 
@@ -164,7 +178,7 @@
             Contact
         </div>
         <div className="absolute left-[441.57px] top-[238px] text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {contact}
+            {requesterEmail}
         </div>
         <div className="absolute left-[405.26px] top-[234.69px]">
             <img 
@@ -180,10 +194,10 @@
             Location
         </div>
         <div className="absolute left-[442.38px] top-[312px] w-44 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            {location}
+            {request.building || 'N/A'}
         </div>
         <div className="absolute left-[441.38px] top-[295px] w-36 h-9 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {room}
+            {request.location}
         </div>
         <div className="absolute left-[405.13px] top-[300.72px]">
             <img 
