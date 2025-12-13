@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import RequestsCard from "@/components/RequestsCard";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import RequestsCard from '@/components/RequestsCard';
 
 type RequestRow = {
     id: string;
@@ -14,19 +14,28 @@ type RequestRow = {
 };
 
 function formatSchedule(dateString?: string) {
-    if (!dateString) return "";
+    if (!dateString) return '';
     const date = new Date(dateString);
-    return `Created on ${date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+    return `Created on ${date.toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+    })}`;
 }
 
-function mapStatusToDisplay(status: string): 'Pending' | 'In Progress' | 'Completed' | 'Cancelled' {
-    const statusMap: Record<string, 'Pending' | 'In Progress' | 'Completed' | 'Cancelled'> = {
-        'pending': 'Pending',
-        'submitted': 'Pending',
-        'under_review': 'Pending',
-        'in_progress': 'In Progress',
-        'completed': 'Completed',
-        'cancelled': 'Cancelled',
+function mapStatusToDisplay(
+    status: string
+): 'Pending' | 'In Progress' | 'Completed' | 'Cancelled' {
+    const statusMap: Record<
+        string,
+        'Pending' | 'In Progress' | 'Completed' | 'Cancelled'
+    > = {
+        pending: 'Pending',
+        submitted: 'Pending',
+        under_review: 'Pending',
+        in_progress: 'In Progress',
+        completed: 'Completed',
+        cancelled: 'Cancelled',
     };
     return statusMap[status] || 'Pending';
 }
@@ -36,46 +45,56 @@ interface RequestContainerProps {
     error: any;
 }
 
-export default function RequestContainer({ requests, error }: RequestContainerProps) {
+export default function RequestContainer({
+    requests,
+    error,
+}: RequestContainerProps) {
     const router = useRouter();
-    const [searchTerm, setSearchTerm] = useState("");
-    const [statusFilter, setStatusFilter] = useState("all");
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const statusOptions = [
-        { value: "all", label: "All Status" },
-        { value: "pending", label: "Pending" },
-        { value: "in_progress", label: "In Progress" },
-        { value: "completed", label: "Completed" },
-        { value: "cancelled", label: "Cancelled" },
+        { value: 'all', label: 'All Status' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'in_progress', label: 'In Progress' },
+        { value: 'completed', label: 'Completed' },
+        { value: 'cancelled', label: 'Cancelled' },
     ];
 
-    const filteredRequests = requests?.filter((req) => {
-        const matchesSearch = 
-            req.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            req.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            req.category?.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        let matchesStatus = false;
-        if (statusFilter === "all") {
-            matchesStatus = true;
-        } else if (statusFilter === "pending") {
-            matchesStatus = req.status === 'submitted' || req.status === 'under_review' || req.status === 'pending';
-        } else {
-            matchesStatus = req.status === statusFilter;
-        }
-        
-        return matchesSearch && matchesStatus;
-    }) || [];
+    const filteredRequests =
+        requests?.filter((req) => {
+            const matchesSearch =
+                req.title
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                req.location
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                req.category?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const selectedStatus = statusOptions.find(opt => opt.value === statusFilter)?.label || "All Status";
+            let matchesStatus = false;
+            if (statusFilter === 'all') {
+                matchesStatus = true;
+            } else if (statusFilter === 'pending') {
+                matchesStatus =
+                    req.status === 'submitted' ||
+                    req.status === 'under_review' ||
+                    req.status === 'pending';
+            } else {
+                matchesStatus = req.status === statusFilter;
+            }
+
+            return matchesSearch && matchesStatus;
+        }) || [];
+
+    const selectedStatus =
+        statusOptions.find((opt) => opt.value === statusFilter)?.label ||
+        'All Status';
 
     return (
         <div className="w-full relative pb-6">
-            {/* Container Background */}
             <div className="w-full min-h-[450px] bg-neutral-100 rounded-2xl border border-lime-950 p-4 sm:p-6">
-                
-                {/* Header */}
                 <div className="mb-4 sm:mb-6">
                     <h2 className="text-lime-950 text-base sm:text-lg font-semibold font-montserrat mb-1">
                         My Requests
@@ -85,9 +104,7 @@ export default function RequestContainer({ requests, error }: RequestContainerPr
                     </p>
                 </div>
 
-                {/* Search and Filter Section */}
                 <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-                    {/* Search Bar */}
                     <div className="w-full sm:flex-1 h-9 sm:h-10 bg-neutral-200 rounded-xl border border-lime-950 relative flex items-center">
                         <img
                             className="absolute left-2 sm:left-3 w-4 h-4"
@@ -103,7 +120,6 @@ export default function RequestContainer({ requests, error }: RequestContainerPr
                         />
                     </div>
 
-                    {/* Status Filter Dropdown */}
                     <div className="w-full sm:w-48 relative">
                         <button
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -118,7 +134,7 @@ export default function RequestContainer({ requests, error }: RequestContainerPr
                                 alt="Arrow Icon"
                             />
                         </button>
-                        
+
                         {isDropdownOpen && (
                             <div className="absolute top-full mt-1 left-0 w-full bg-white border border-lime-950 rounded-xl shadow-lg z-20 overflow-hidden">
                                 {statusOptions.map((option) => (
@@ -138,7 +154,6 @@ export default function RequestContainer({ requests, error }: RequestContainerPr
                     </div>
                 </div>
 
-                {/* Requests Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                     {error && (
                         <div className="col-span-full text-red-600 text-sm p-4 bg-red-50 rounded-lg">
@@ -147,7 +162,9 @@ export default function RequestContainer({ requests, error }: RequestContainerPr
                     )}
                     {!error && filteredRequests.length === 0 && (
                         <div className="col-span-full text-sm text-lime-950 text-center py-8">
-                            {requests?.length === 0 ? "No requests yet." : "No requests match your search."}
+                            {requests?.length === 0
+                                ? 'No requests yet.'
+                                : 'No requests match your search.'}
                         </div>
                     )}
                     {filteredRequests.map((req) => (
