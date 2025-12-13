@@ -23,6 +23,18 @@ const config = {
         electrolize: ['var(--font-electrolize)', 'sans-serif'],
         sans: ['var(--font-montserrat)', 'sans-serif'],
       },
+      animation: {
+        'spin-slow': 'spin 30s linear infinite',
+        'spin-slower': 'spin 25s linear infinite',
+        'spin-slowest': 'spin 20s linear infinite',
+        'float': 'float 6s ease-in-out infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
