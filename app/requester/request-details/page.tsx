@@ -34,7 +34,7 @@ export default function RequestDetailsPage({
       </div>
 
       <div className="flex items-center pb-10 justify-center">
-        <ManagementActions />
+        <ManagementActions requestId={requestId} />
       </div>
 
       <div className="flex items-center justify-center">
