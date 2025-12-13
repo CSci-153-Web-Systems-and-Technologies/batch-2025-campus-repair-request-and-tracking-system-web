@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import RepairRequestFormFields from "@/components/RepairRequestFormFields";
 import Header from "@/components/Header";
+import Modal from "@/components/ui/modal";
 
 const FORM_INITIAL_STATE = {
 dateFiled: new Date().toISOString().split('T')[0],
@@ -32,6 +33,14 @@ const [loading, setLoading] = useState(false);
 const [submitMessage, setSubmitMessage] = useState("");
 const [formData, setFormData] = useState(FORM_INITIAL_STATE);
 const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+const [modal, setModal] = useState({
+  isOpen: false,
+  title: '',
+  message: '' as string | string[],
+  type: 'info' as 'success' | 'error' | 'info' | 'warning',
+  primaryButtonText: 'OK',
+  onPrimaryClick: undefined as (() => void) | undefined,
+});
 
 useEffect(() => {
     const loadData = async () => {
@@ -104,9 +113,22 @@ const hasUnsavedChanges = () => {
 };
 
 const handleCancel = () => {
-    if (!hasUnsavedChanges() || window.confirm("You have unsaved changes. Cancel and go to dashboard?")) {
-    router.push("/requester/dashboard");
+    if (!hasUnsavedChanges()) {
+        router.push("/requester/dashboard");
+        return;
     }
+    
+    setModal({
+        isOpen: true,
+        title: 'Unsaved Changes',
+        message: 'You have unsaved changes. Are you sure you want to leave without saving?',
+        type: 'warning',
+        primaryButtonText: 'Leave',
+        onPrimaryClick: () => {
+            setModal({ ...modal, isOpen: false });
+            router.push("/requester/dashboard");
+        },
+    });
 };
 
 const validateForm = (): string[] => {
@@ -153,7 +175,17 @@ const handleSubmit = async (e: React.FormEvent) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
         
     if (authError || !user) {
-        alert("You must be logged in to submit a repair request!");
+        setModal({
+          isOpen: true,
+          title: 'Authentication Required',
+          message: 'You must be logged in to submit a repair request.',
+          type: 'error',
+          primaryButtonText: 'Go to Login',
+          onPrimaryClick: () => {
+            setModal({ ...modal, isOpen: false });
+            router.push('/login');
+          },
+        });
         setSubmitMessage("Please log in to submit a request");
         setLoading(false);
         return;
@@ -161,7 +193,14 @@ const handleSubmit = async (e: React.FormEvent) => {
         
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
-        alert(`Please fix:\n${validationErrors.join('\n')}`);
+        setModal({
+          isOpen: true,
+          title: 'Form Validation Error',
+          message: validationErrors,
+          type: 'error',
+          primaryButtonText: 'OK',
+          onPrimaryClick: () => setModal({ ...modal, isOpen: false }),
+        });
         setSubmitMessage(validationErrors.join(', '));
         setLoading(false);
         return;
@@ -217,36 +256,55 @@ const handleSubmit = async (e: React.FormEvent) => {
     
     setSubmitMessage(`Request #${requestId} submitted successfully!`);
     
+    setModal({
+      isOpen: true,
+      title: 'Success!',
+      message: `Request #${requestId} has been submitted successfully. Redirecting to dashboard...`,
+      type: 'success',
+      primaryButtonText: 'Go to Dashboard',
+      onPrimaryClick: () => {
+        setModal({ ...modal, isOpen: false });
+        router.push("/requester/dashboard");
+      },
+    });
+    
     setFormData(FORM_INITIAL_STATE);
         
     setTimeout(() => {
         router.push("/requester/dashboard");
-    }, 1500);
+    }, 3000);
         
     } catch (error: any) {
     console.error("Submission error:", error);
-    alert(`Error: ${error.message}`);
+    setModal({
+      isOpen: true,
+      title: 'Submission Error',
+      message: error.message || 'An unexpected error occurred while submitting your request.',
+      type: 'error',
+      primaryButtonText: 'OK',
+      onPrimaryClick: () => setModal({ ...modal, isOpen: false }),
+    });
     setSubmitMessage(`Error: ${error.message}`);
     } finally {
     setLoading(false);
     }
 };
 
-const getMessageStyles = () => {
-    const isSuccess = submitMessage.includes('Request #');
-    return {
-    container: isSuccess 
-        ? 'bg-green-50 border border-green-200 text-green-800' 
-        : 'bg-red-50 border border-red-200 text-red-800',
-    icon: isSuccess ? '✅' : '❌'
-    };
-};
 
-const messageStyles = getMessageStyles();
 
 return (
     <div>
     <Header userName="Angielyn" />
+
+    <Modal
+      isOpen={modal.isOpen}
+      title={modal.title}
+      message={modal.message}
+      type={modal.type}
+      primaryButtonText={modal.primaryButtonText}
+      onPrimaryClick={modal.onPrimaryClick}
+      onClose={() => setModal({ ...modal, isOpen: false })}
+    />
         
     <div className="min-h-screen p-4 md:p-8 pt-6">
         <div className="w-full border border-lime-950 font-xs font-montserrat rounded-lg bg-white p-4 md:p-6 shadow-sm">
@@ -254,15 +312,6 @@ return (
         <h1 className="text-2xl font-bold mb-6 text-lime-950 font-electrolize">
             Repair Request Form
         </h1>
-            
-        {submitMessage && (
-            <div className={`p-4 mb-6 rounded-lg ${messageStyles.container}`}>
-            <div className="flex items-center">
-                {messageStyles.icon}
-                <span className="ml-2 font-medium">{submitMessage}</span>
-            </div>
-            </div>
-        )}
             
         <RepairRequestFormFields
             formData={formData}
