@@ -34,12 +34,12 @@ const [submitMessage, setSubmitMessage] = useState("");
 const [formData, setFormData] = useState(FORM_INITIAL_STATE);
 const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
 const [modal, setModal] = useState({
-  isOpen: false,
-  title: '',
-  message: '' as string | string[],
-  type: 'info' as 'success' | 'error' | 'info' | 'warning',
-  primaryButtonText: 'OK',
-  onPrimaryClick: undefined as (() => void) | undefined,
+    isOpen: false,
+    title: '',
+    message: '' as string | string[],
+    type: 'info' as 'success' | 'error' | 'info' | 'warning',
+    primaryButtonText: 'OK',
+    onPrimaryClick: undefined as (() => void) | undefined,
 });
 
 useEffect(() => {
@@ -176,15 +176,15 @@ const handleSubmit = async (e: React.FormEvent) => {
         
     if (authError || !user) {
         setModal({
-          isOpen: true,
-          title: 'Authentication Required',
-          message: 'You must be logged in to submit a repair request.',
-          type: 'error',
-          primaryButtonText: 'Go to Login',
-          onPrimaryClick: () => {
-            setModal({ ...modal, isOpen: false });
-            router.push('/login');
-          },
+            isOpen: true,
+            title: 'Authentication Required',
+            message: 'You must be logged in to submit a repair request.',
+            type: 'error',
+            primaryButtonText: 'Go to Login',
+            onPrimaryClick: () => {
+                setModal({ ...modal, isOpen: false });
+                router.push('/login');
+            },
         });
         setSubmitMessage("Please log in to submit a request");
         setLoading(false);
@@ -194,12 +194,12 @@ const handleSubmit = async (e: React.FormEvent) => {
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
         setModal({
-          isOpen: true,
-          title: 'Form Validation Error',
-          message: validationErrors,
-          type: 'error',
-          primaryButtonText: 'OK',
-          onPrimaryClick: () => setModal({ ...modal, isOpen: false }),
+            isOpen: true,
+            title: 'Form Validation Error',
+            message: validationErrors,
+            type: 'error',
+            primaryButtonText: 'OK',
+            onPrimaryClick: () => setModal({ ...modal, isOpen: false }),
         });
         setSubmitMessage(validationErrors.join(', '));
         setLoading(false);
@@ -254,18 +254,18 @@ const handleSubmit = async (e: React.FormEvent) => {
         }
     }
     
-    setSubmitMessage(`Request #${requestId} submitted successfully!`);
+    setSubmitMessage(`Your request submitted successfully!`);
     
     setModal({
-      isOpen: true,
-      title: 'Success!',
-      message: `Request #${requestId} has been submitted successfully. Redirecting to dashboard...`,
-      type: 'success',
-      primaryButtonText: 'Go to Dashboard',
-      onPrimaryClick: () => {
-        setModal({ ...modal, isOpen: false });
-        router.push("/requester/dashboard");
-      },
+        isOpen: true,
+        title: 'Success!',
+        message: `Your request has been submitted successfully. Redirecting to dashboard...`,
+        type: 'success',
+        primaryButtonText: 'Go to Dashboard',
+        onPrimaryClick: () => {
+            setModal({ ...modal, isOpen: false });
+            router.push("/requester/dashboard");
+        },
     });
     
     setFormData(FORM_INITIAL_STATE);
@@ -277,12 +277,12 @@ const handleSubmit = async (e: React.FormEvent) => {
     } catch (error: any) {
     console.error("Submission error:", error);
     setModal({
-      isOpen: true,
-      title: 'Submission Error',
-      message: error.message || 'An unexpected error occurred while submitting your request.',
-      type: 'error',
-      primaryButtonText: 'OK',
-      onPrimaryClick: () => setModal({ ...modal, isOpen: false }),
+        isOpen: true,
+        title: 'Submission Error',
+        message: error.message || 'An unexpected error occurred while submitting your request.',
+        type: 'error',
+        primaryButtonText: 'OK',
+        onPrimaryClick: () => setModal({ ...modal, isOpen: false }),
     });
     setSubmitMessage(`Error: ${error.message}`);
     } finally {

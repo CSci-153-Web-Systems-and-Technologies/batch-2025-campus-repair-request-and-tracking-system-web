@@ -8,7 +8,6 @@ import { createClient } from '@/utils/supabase/server';
 export default async function RequesterDashboard() {
     const supabase = createClient();
     
-    // Get current user
     const {
         data: { user },
     } = await supabase.auth.getUser();
@@ -21,15 +20,14 @@ export default async function RequesterDashboard() {
     };
     
     if (user) {
-        // Fetch all requests for the current user
         const { data: requests, error } = await supabase
             .from('requests')
             .select('status')
             .eq('requester_id', user.id);
         
         if (requests) {
-            statusCounts.total = requests.length;
-            statusCounts.pending = requests.filter((r) => r.status === 'under_review').length;
+            statusCounts.total = requests.filter((r) => r.status !== 'cancelled').length;
+            statusCounts.pending = requests.filter((r) => r.status === 'under_review' || r.status === 'submitted').length;
             statusCounts.inProgress = requests.filter((r) => r.status === 'in_progress').length;
             statusCounts.completed = requests.filter((r) => r.status === 'completed').length;
         }

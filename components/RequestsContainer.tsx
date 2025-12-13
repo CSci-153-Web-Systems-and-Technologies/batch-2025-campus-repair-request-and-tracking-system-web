@@ -36,8 +36,17 @@ export default async function RequestContainer() {
         .eq("requester_id", user.id)
         .order("created_at", { ascending: false });
 
+    const numRequests = requests?.length || 0;
+    const numRows = Math.ceil(numRequests / 4);
+    const cardHeight = 240;
+    const gap = 12;
+    const topSpacing = 150;
+    const bottomPadding = 24;
+    const containerHeight = topSpacing + (numRows * cardHeight) + ((numRows - 1) * gap) + bottomPadding;
+    const minHeight = Math.max(450, containerHeight);
+
     return (
-        <div className="w-full max-w-[1326px] mx-auto h-[450px] relative">
+        <div className="w-full max-w-[1326px] mx-auto relative pb-6" style={{ minHeight: `${minHeight}px` }}>
             <div className="w-full h-full absolute bg-neutral-100 rounded-2xl border border-lime-950"></div>
 
             <div className="absolute top-3 left-4 text-lime-950 text-sm font-semibold font-montserrat">
@@ -74,7 +83,7 @@ export default async function RequestContainer() {
                 </div>
             </div>
 
-            <div className="absolute top-[150px] left-1/2 transform -translate-x-1/2 w-full px-4 grid grid-cols-4 gap-3">
+            <div className="relative top-[150px] w-full px-4 grid grid-cols-4 gap-3 pb-4">
                 {error && (
                     <div className="col-span-4 text-red-600 text-sm">{error.message}</div>
                 )}
