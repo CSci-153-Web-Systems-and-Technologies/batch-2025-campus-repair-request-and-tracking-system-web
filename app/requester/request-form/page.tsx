@@ -215,11 +215,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         uploadedPhotoUrls = (await Promise.all(uploadPromises)).filter(Boolean) as string[];
     }
         
-    const categoryMap = new Map(categories.map(cat => [cat.id, cat.name] as const));
-    const primaryCategoryId = formData.workNature[0];
-    const primaryCategoryName = primaryCategoryId ? categoryMap.get(primaryCategoryId) : undefined;
-
-
     const requestData = {
         title: formData.workDescription, 
         location: formData.location, 

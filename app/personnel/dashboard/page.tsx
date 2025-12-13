@@ -1,4 +1,3 @@
-import React from 'react';
 import Header from '@/components/Header';
 import StatusCard from '@/components/StatusCard';
 import MainContainer from '@/components/PersonnelRequests';
@@ -19,7 +18,7 @@ export default async function PersonnelDashboard() {
         completed: 0,
     };
     
-    const { data: requests, error } = await supabase
+    const { data: requests } = await supabase
         .from('requests')
         .select('status');
     
