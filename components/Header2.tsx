@@ -1,7 +1,20 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
 export default function Header2() {
+    const router = useRouter();
+
+    const handleBack = () => {
+        router.back();
+    };
+
     return (
         <div className="w-[1728px] h-20 relative">
-            <button className="w-24 h-8 left-[40px] top-5  absolute bg-neutral-100 rounded-[3px] border border-stone-400">
+            <button 
+                onClick={handleBack}
+                className="w-24 h-8 left-[40px] top-5 absolute bg-neutral-100 rounded-[3px] border border-stone-400 hover:bg-neutral-200 transition-colors"
+            >
                 <div className="left-[42px] top-[3px] absolute text-black text-base font-normal font-['Electrolize'] leading-6">
                     Back
                 </div>

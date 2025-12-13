@@ -4,7 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import RequestContainer2 from '@/components/RequestsContainer2';
 import { createClient } from '@/utils/supabase/client';
 
-const statusOptions = ["All", "Submitted", "Pending", "In Progress", "Completed", "Cancelled"];
+const statusOptions = ["All", "submitted", "under_review", "in_progress", "completed", "cancelled"];
+const statusLabels: { [key: string]: string } = {
+    "submitted": "Submitted",
+    "under_review": "Under Review",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+};
 const departmentOptions = ["All", "Department of Computer Science and Technology", "Library", "Department of Teacher Education", "Admin", "Other"];
 const defaultCategoryOptions = ["All"];
 
@@ -66,6 +73,8 @@ const MainContainer = () => {
                 <span className="text-lime-950 text-sm font-light truncate">
                     {value === "All"
                         ? `All ${type === "status" ? "Status" : type === "department" ? "Departments" : "Categories"}`
+                        : type === "status"
+                        ? statusLabels[value] || value
                         : value}
                 </span>
                 <img className="size-5" src="/images/arrow.png" alt="Dropdown icon" />
@@ -81,7 +90,7 @@ const MainContainer = () => {
                                 setOpenDropdown(null);
                             }}
                         >
-                            {opt}
+                            {type === "status" && opt !== "All" ? statusLabels[opt] || opt : opt}
                         </button>
                     ))}
                 </div>
@@ -112,7 +121,7 @@ const MainContainer = () => {
                         <input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search requests..."
+                            placeholder="Search requests..."    
                             className="w-full h-12 pl-10 pr-4 bg-neutral-200 rounded-2xl border border-lime-950 text-sm text-lime-950 focus:outline-none"
                         />
                     </div>

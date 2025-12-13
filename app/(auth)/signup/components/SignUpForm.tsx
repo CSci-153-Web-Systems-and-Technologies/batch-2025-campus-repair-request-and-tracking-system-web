@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import { useFormState } from "react-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,6 +14,30 @@ import { Label } from "@/components/ui/label";
 import { signup } from "@/lib/auth-actions";
 
 export function SignUpForm() {
+  const [state, formAction] = useFormState(async (_prevState: any, formData: FormData) => {
+    return await signup(formData);
+  }, null);
+
+  if (state?.success && state?.message) {
+    return (
+      <Card className="mx-auto max-w-sm font-montserrat rounded-[10px] box-content p-6">
+        <CardHeader>
+          <CardTitle className="text-xl text-[#0D3311] font-electrolize">Check your email</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-800">
+              {state.message}
+            </div>
+            <Link href="/login">
+              <Button className="w-full">Go to Login</Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="mx-auto max-w-sm font-montserrat rounded-[10px] box-content p-6">
       <CardHeader>
@@ -21,7 +47,7 @@ export function SignUpForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form action={formAction}>
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
@@ -112,14 +138,18 @@ export function SignUpForm() {
               >
                 <option value="">Select a role</option>
                 <option value="requester">Requester</option>
-                <option value="clerk">Clerk</option>
                 <option value="personnel">Personnel</option>
               </select>
             </div>
 
+            {state?.error && (
+              <div className="text-red-600 text-sm" role="alert">
+                {state.error}
+              </div>
+            )}
+
             <Button 
               type="submit" 
-              formAction={signup}
               className="w-full"
             >
               Create an account

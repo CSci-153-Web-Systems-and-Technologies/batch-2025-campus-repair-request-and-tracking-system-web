@@ -1,4 +1,6 @@
+"use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 interface RequestRowProps {
   request: {
@@ -11,7 +13,16 @@ interface RequestRowProps {
   };
 }
 
+const statusLabels: { [key: string]: string } = {
+  "submitted": "Submitted",
+  "under_review": "Under Review",
+  "in_progress": "In Progress",
+  "completed": "Completed",
+  "cancelled": "Cancelled",
+};
+
 const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
+  const router = useRouter();
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -24,9 +35,11 @@ const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
     switch (status.toLowerCase()) {
       case 'completed':
         return { bg: 'bg-green-100', text: 'text-green-600', icon: '✅' };
-      case 'pending':
-        return { bg: 'bg-yellow-100', text: 'text-orange-600', icon: '⏳' };
-      case 'in progress':
+      case 'submitted':
+        return { bg: 'bg-gray-100', text: 'text-gray-600', icon: '📝' };
+      case 'under_review':
+        return { bg: 'bg-yellow-100', text: 'text-orange-600', icon: '👀' };
+      case 'in_progress':
         return { bg: 'bg-sky-100', text: 'text-sky-600', icon: '🔨' };
       case 'cancelled':
         return { bg: 'bg-red-100', text: 'text-red-600', icon: '❌' };
@@ -72,14 +85,14 @@ const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
       </div>
 
       {/* Status */}
-      <div className="col-span-2 relative h-8">
-        <div className="ml-5 w-full h-8 bg-neutral-200 rounded-2xl"></div>
+      <div className="col-span-2 relative h-6">
+        <div className="ml-5 w-full h-6 bg-neutral-200 rounded-2xl"></div>
         <div
-          className={`ml-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-36 h-6 px-5 py-2 ${statusStyle.bg} rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] flex justify-center items-center`}
+          className={`ml-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-1 ${statusStyle.bg} rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] flex justify-center items-center whitespace-nowrap`}
         >
-          <div className="flex justify-center items-center gap-2">
-            <div className={`${statusStyle.text} text-sm font-semibold font-electrolize`}>
-              {statusStyle.icon} {request.status}
+          <div className="flex justify-center items-center gap-1">
+            <div className={`${statusStyle.text} text-xs font-semibold font-electrolize`}>
+              {statusStyle.icon} {statusLabels[request.status.toLowerCase()] || request.status}
             </div>
           </div>
         </div>
@@ -112,7 +125,8 @@ const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
 
         <div className="ml-8 col-span-2 flex items-center justify-start gap-2">
             <button
-            className="w-24 h-6 px-5 py-2 bg-stone-300 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center"
+            onClick={() => router.push(`/personnel/request-details?id=${request.id}`)}
+            className="w-24 h-6 px-5 py-2 bg-stone-300 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center hover:bg-stone-400 cursor-pointer transition-colors"
             >
             <div className=" flex justify-start items-center row-2 gap-1">
                 <img
