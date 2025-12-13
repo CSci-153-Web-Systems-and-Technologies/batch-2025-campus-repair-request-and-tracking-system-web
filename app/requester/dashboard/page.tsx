@@ -4,6 +4,7 @@ import StatusCard from '@/components/StatusCard';
 import { statusCardsData } from '@/data/statusCards';
 import SubmitRequestCard from '@/components/SubmitRequestCard';
 import RequestsContainer from '@/components/RequestsContainer';
+import DarkModeToggle from '@/components/DarkModeToggle';
 
 export default function RequesterDashboard() {
     
@@ -13,7 +14,10 @@ export default function RequesterDashboard() {
     
     return (
         <div>        
-        <Header userName="Angielyn" />
+        <div className="flex items-center justify-between px-8 pt-6">
+          <Header userName="Angielyn" />
+          <DarkModeToggle />
+        </div>
         <div className="min-h-screen p-8 pt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 ml-14 mr-14">
             {statusCardsData.map((card) => (
