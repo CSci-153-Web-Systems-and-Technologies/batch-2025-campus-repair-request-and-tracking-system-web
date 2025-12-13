@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-    export interface StatusCardProps {
+
+export interface StatusCardProps {
     count: number;
     status: string;
     iconSrc: string;
@@ -9,9 +10,9 @@ import React, { useState } from 'react';
     bgColor?: string;
     textColor?: string;
     borderColor?: string;
-    }
+}
 
-    const StatusCard: React.FC<StatusCardProps> = ({
+const StatusCard: React.FC<StatusCardProps> = ({
     count,
     status,
     iconSrc,
@@ -19,49 +20,49 @@ import React, { useState } from 'react';
     bgColor = 'bg-neutral-100',
     textColor = 'text-lime-950',
     borderColor = 'border-lime-950',
-    }) => {
+}) => {
     const [imageError, setImageError] = useState(false);
 
     return (
-        <div className="relative ml-2 mr-2 mt-5 h-20">
-        <div className={` left-0 top-0 w-65 h-20 ${bgColor} rounded-2xl border ${borderColor}`}>
-        
-        {/* Status */}
-        <div className={`absolute left-[30px] top-[1px] ${textColor} text-sm font-normal font-montserrat leading-9 tracking-wide`}>
-            {status}
-        </div>
-        
-        {/* Count */}
-        <div className={`absolute left-[30px] top-[35px] ${textColor} text-4xl font-normal font-electrolize leading-9 tracking-wider`}>
-            {count}
-        </div>
-        
-        {/* Image */}
-        <div className="relative left-[225px] top-[15px]">
-            <div className="relative w-12 h-12">
-            <div className="w-full h-full rounded-lg overflow-hidden">
-                {!imageError && iconSrc ? (
-                <img
-                    src={iconSrc}
-                    alt={iconAlt}
-                    width={48}
-                    height={48}
-                    className="object-contain w-full h-full p-1"
-                    onError={() => setImageError(true)}
-                />
-                ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                    <span className=" text-lg font-medium">
-                    {status.charAt(0)}
-                    </span>
+        <div className="relative w-full h-20 sm:h-20 px-2 sm:px-0">
+            <div className={`relative w-full h-full ${bgColor} rounded-2xl border ${borderColor} flex items-center px-4 sm:px-6`}>
+                {/* Text Content */}
+                <div className="flex flex-col justify-center flex-1 min-w-0">
+                    {/* Status */}
+                    <div className={`${textColor} text-xs sm:text-sm font-normal font-montserrat leading-tight tracking-wide truncate`}>
+                        {status}
+                    </div>
+                    
+                    {/* Count */}
+                    <div className={`${textColor} text-2xl sm:text-3xl lg:text-4xl font-normal font-electrolize leading-tight tracking-wider`}>
+                        {count}
+                    </div>
                 </div>
-                )}
+                
+                {/* Icon */}
+                <div className="flex-shrink-0 ml-2 sm:ml-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12">
+                        <div className="w-full h-full rounded-lg overflow-hidden">
+                            {!imageError && iconSrc ? (
+                                <img
+                                    src={iconSrc}
+                                    alt={iconAlt}
+                                    className="object-contain w-full h-full p-1"
+                                    onError={() => setImageError(true)}
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-neutral-200 rounded-lg">
+                                    <span className="text-lime-950 text-lg font-medium">
+                                        {status.charAt(0)}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
-            </div>
-        </div>
-        </div>
         </div>
     );
-    };
+};
 
-    export default StatusCard;
+export default StatusCard;

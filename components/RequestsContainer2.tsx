@@ -34,13 +34,30 @@ const RequestContainer2: React.FC<RequestContainer2Props> = ({
         const supabase = createClient();
         const { data, error } = await supabase
             .from('requests')
-            .select('id, title, category, location, status, created_at')
+            .select(`
+                id, 
+                title, 
+                location, 
+                status, 
+                created_at,
+                request_categories(
+                    categories(name)
+                )
+            `)
             .order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error fetching requests:', error);
         } else {
-            setRequests(data || []);
+            const formattedData = (data || []).map((req: any) => ({
+                id: req.id,
+                title: req.title,
+                location: req.location,
+                status: req.status,
+                created_at: req.created_at,
+                category: req.request_categories?.[0]?.categories?.name || 'Uncategorized'
+            }));
+            setRequests(formattedData);
         }
         setLoading(false);
     };
@@ -59,16 +76,21 @@ const RequestContainer2: React.FC<RequestContainer2Props> = ({
                 ? req.title.toLowerCase().includes(query) || req.category.toLowerCase().includes(query) || req.location.toLowerCase().includes(query)
                 : true;
 
-            const matchesStatus = statusFilter && statusFilter !== "all"
-                ? req.status.toLowerCase() === statusFilter
-                : true;
+            let matchesStatus = true;
+            if (statusFilter && statusFilter !== "all") {
+                if (statusFilter === "pending") {
+                    matchesStatus = req.status === 'submitted' || req.status === 'under_review' || req.status === 'pending';
+                } else {
+                    matchesStatus = req.status.toLowerCase() === statusFilter;
+                }
+            }
 
             const matchesDepartment = departmentFilter && departmentFilter !== "all"
                 ? req.location.toLowerCase().includes(departmentFilter)
                 : true;
 
             const matchesCategory = categoryFilter && categoryFilter !== "all"
-                ? req.category.toLowerCase().includes(categoryFilter)
+                ? req.category.toLowerCase() === categoryFilter
                 : true;
 
             return matchesQuery && matchesStatus && matchesDepartment && matchesCategory;
@@ -83,14 +105,15 @@ return (
             <div className="relative w-full min-h-[500px] rounded-2xl">
             <div className="absolute inset-0 bg-neutral-100 rounded-2xl border border-lime-950"></div>
 
-            <div className="absolute left-12 right-0 top-0 h-10 px-6 z-10 grid grid-cols-12 items-center">
+            {/* Headers (desktop only) */}
+            <div className="hidden lg:grid absolute left-12 right-0 top-0 h-10 px-6 z-10 grid-cols-12 items-center">
                 <div className="col-span-2 text-lime-950 text-sm font-semibold truncate">
                 Request
                 </div>
                 <div className="ml-3 col-span-2 text-lime-950 text-sm font-semibold truncate">
                 Location
                 </div>
-                <div className="col-span-2 ml-14 text-lime-950 text-sm font-semibold truncate">
+                <div className="col-span-2 ml-5 text-lime-950 text-sm font-semibold truncate">
                 Status
                 </div>
                 <div className="col-span-2 text-lime-950 ml-16 text-sm font-semibold truncate">
@@ -104,24 +127,24 @@ return (
                 </div>
             </div>
 
-            <div className="absolute left-0 right-0 top-[40px] border border-black" />
+            <div className="hidden lg:block absolute left-0 right-0 top-[40px] border border-black" />
 
-            <div className="absolute top-[60px] left-0 right-0 bottom-0 overflow-y-auto px-4">
+            <div className="absolute top-0 lg:top-[60px] left-0 right-0 bottom-0 overflow-y-auto px-2 sm:px-4 pt-4 lg:pt-0">
                 {loading ? (
                     <div className="flex justify-center items-center h-32">
-                    <div className="text-lime-950 text-sm">Loading requests...</div>
+                        <div className="text-lime-950 text-sm">Loading requests...</div>
                     </div>
                 ) : filteredRequests.length === 0 ? (
                     <div className="flex justify-center items-center h-32">
-                    <div className="text-lime-950 text-sm">
-                        {isFiltered ? "No matching requests" : "No requests found"}
-                    </div>
+                        <div className="text-lime-950 text-sm">
+                            {isFiltered ? "No matching requests" : "No requests found"}
+                        </div>
                     </div>
                 ) : (
                     <div className="space-y-3">
-                    {filteredRequests.map((request) => (
-                        <RequestRow key={request.id} request={request} />
-                    ))}
+                        {filteredRequests.map((request) => (
+                            <RequestRow key={request.id} request={request} />
+                        ))}
                     </div>
                 )}
             </div>

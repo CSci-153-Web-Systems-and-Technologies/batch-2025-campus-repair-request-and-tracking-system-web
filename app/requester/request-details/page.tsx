@@ -12,11 +12,9 @@ export default function RequestDetailsPage({
 
   if (!requestId) {
     return (
-      <div>
-        <div className="pb-10">
-          <Header2 />
-        </div>
-        <div className="flex items-center justify-center">
+      <div className="min-h-screen bg-white">
+        <Header2 />
+        <div className="flex items-center justify-center p-8">
           <p className="text-red-600 text-sm">No request ID provided</p>
         </div>
       </div>
@@ -24,21 +22,22 @@ export default function RequestDetailsPage({
   }
 
   return (
-    <div>
-      <div className="pb-10">
-        <Header2 />
-      </div>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <Header2 />
+      
+      {/* Content Container */}
+      <div className="px-0 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8 lg:space-y-10">
+        
+        {/* Request Details */}
+        <div className="flex items-center justify-center">
+          <RequestDetails requestId={requestId} />
+        </div>
 
-      <div className="flex items-center justify-center pb-10">
-        <RequestDetails requestId={requestId} />
-      </div>
-
-      <div className="flex items-center pb-10 justify-center">
-        <ManagementActions requestId={requestId} />
-      </div>
-
-      <div className="flex items-center justify-center">
-        <CommunicationUpdates />
+        {/* Communication Updates */}
+        <div className="flex items-center justify-center">
+          <CommunicationUpdates requestId={requestId} role="requester" />
+        </div>
       </div>
     </div>
   );

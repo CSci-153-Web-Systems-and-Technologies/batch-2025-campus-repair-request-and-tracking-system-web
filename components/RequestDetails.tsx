@@ -3,19 +3,19 @@ import { createClient } from '@/utils/supabase/server';
 
 interface RequestDetailsProps {
     requestId: string;
-    }
+}
 
-    async function getRequestDetails(requestId: string) {
+async function getRequestDetails(requestId: string) {
     const supabase = createClient();
     
     const { data: request, error } = await supabase
         .from('requests')
         .select(`
-        *,
-        profile:requester_id (
-            full_name,
-            email_address
-        )
+            *,
+            profile:requester_id (
+                full_name,
+                email_address
+            )
         `)
         .eq('id', requestId)
         .single();
@@ -25,16 +25,16 @@ interface RequestDetailsProps {
     }
     
     return request;
-    }
+}
 
-    const RequestDetails = async ({ requestId }: RequestDetailsProps) => {
+const RequestDetails = async ({ requestId }: RequestDetailsProps) => {
     const request = await getRequestDetails(requestId);
     
     if (!request) {
         return (
-        <div className="relative w-[788px] h-96 bg-neutral-100 rounded-2xl border border-lime-950 flex items-center justify-center">
-            <p className="text-red-600 text-sm">Request not found</p>
-        </div>
+            <div className="w-full max-w-[788px] min-h-[384px] bg-neutral-100 rounded-2xl border border-lime-950 flex items-center justify-center mx-4">
+                <p className="text-red-600 text-sm">Request not found</p>
+            </div>
         );
     }
     
@@ -42,25 +42,25 @@ interface RequestDetailsProps {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        month: '2-digit', 
-        day: '2-digit', 
-        year: 'numeric' 
+            weekday: 'long', 
+            month: '2-digit', 
+            day: '2-digit', 
+            year: 'numeric' 
         });
     };
     
     const getStatusStyle = (status: string) => {
         switch (status?.toLowerCase()) {
-        case 'completed':
-            return { bg: 'bg-green-100', text: 'text-green-600', icon: '✅' };
-        case 'pending':
-            return { bg: 'bg-yellow-100', text: 'text-orange-600', icon: '⏳' };
-        case 'in progress':
-            return { bg: 'bg-sky-100', text: 'text-sky-600', icon: '🔨' };
-        case 'cancelled':
-            return { bg: 'bg-red-100', text: 'text-red-600', icon: '❌' };
-        default:
-            return { bg: 'bg-gray-100', text: 'text-gray-600', icon: '' };
+            case 'completed':
+                return { bg: 'bg-green-100', text: 'text-green-600', icon: '✅' };
+            case 'pending':
+                return { bg: 'bg-yellow-100', text: 'text-orange-600', icon: '⏳' };
+            case 'in progress':
+                return { bg: 'bg-sky-100', text: 'text-sky-600', icon: '🔨' };
+            case 'cancelled':
+                return { bg: 'bg-red-100', text: 'text-red-600', icon: '❌' };
+            default:
+                return { bg: 'bg-gray-100', text: 'text-gray-600', icon: '' };
         }
     };
     
@@ -69,146 +69,135 @@ interface RequestDetailsProps {
     const requesterEmail = request.profile?.email_address || 'N/A';
 
     return (
-        <div className="relative w-[788px] h-96">
-        <div className="absolute left-0 top-0 w-[788px] h-96 bg-neutral-100 rounded-2xl border border-lime-950" />
-        
-        {/* Title */}
-        <div className="absolute left-[24.07px] font-electrolize top-[18px] w-40 h-12 text-lime-950 text-base font-semibold leading-9 tracking-wide">
-            {request.title}
-        </div>
-        
-        {/* Description */}
-        <div className="text-lime-950 text-base leading-9 tracking-wide absolute left-[24.07px] top-[43px] w-96 ">
-            {request.description || 'No description provided'}
-        </div>
-        
-        {/* Status, Priority, Category - Responsive Container */}
-        <div className="absolute left-[24.07px] top-[93px] flex flex-wrap items-center gap-2 max-w-[740px]">
-            {/* Status */}
-            <div className={`h-6 px-5 py-2 ${statusStyle.bg} rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center border border-black`}>
-            <div className={`${statusStyle.text} text-sm font-semibold font-electrolize leading-5 whitespace-nowrap`}>
-                {statusStyle.icon} {request.status}
+        <div className="w-full max-w-[788px] mx-4 sm:mx-6 lg:mx-auto">
+            <div className="bg-neutral-100 rounded-2xl border border-lime-950 p-4 sm:p-5 lg:p-6">
+                
+                {/* Title */}
+                <h1 className="font-electrolize text-lime-950 text-base sm:text-lg font-semibold leading-tight tracking-wide mb-3 break-words">
+                    {request.title}
+                </h1>
+                
+                {/* Description */}
+                <p className="text-lime-950 text-sm sm:text-base leading-relaxed tracking-wide mb-4 break-words">
+                    {request.description ?? ''}
+                </p>
+                
+                {/* Status, Priority, Category Badges */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                    {/* Status */}
+                    <div className={`h-7 px-4 py-1.5 ${statusStyle.bg} rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center border border-black`}>
+                        <span className={`${statusStyle.text} text-xs sm:text-sm font-semibold font-electrolize whitespace-nowrap`}>
+                            {statusStyle.icon} {request.status}
+                        </span>
+                    </div>
+                    
+                    {/* Priority */}
+                    <div className="h-7 px-4 py-1.5 bg-red-100 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center">
+                        <span className="text-red-700 text-xs sm:text-sm font-semibold font-electrolize whitespace-nowrap">
+                            {request.priority || 'Medium'}
+                        </span>
+                    </div>
+                    
+                    {/* Category */}
+                    <div className="h-7 px-4 py-1.5 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] border border-black inline-flex justify-center items-center">
+                        <span className="text-black text-xs sm:text-sm font-semibold font-electrolize whitespace-nowrap">
+                            {request.category}
+                        </span>
+                    </div>
+                </div>
+                
+                {/* Details Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
+                    
+                    {/* Left Column */}
+                    <div className="space-y-6">
+                        {/* Location */}
+                        <div className="flex items-start gap-3">
+                            <img 
+                                src="/images/location.png" 
+                                alt="location icon" 
+                                className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                                <p className="text-lime-950 text-xs font-light font-montserrat">Location</p>
+                                <p className="text-lime-950 text-sm font-semibold font-montserrat mt-1 break-words">
+                                    {request.location}
+                                </p>
+                                {request.building && (
+                                    <p className="text-lime-950 text-xs font-light font-montserrat mt-1">
+                                        {request.building}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                        
+                        {/* Created */}
+                        <div className="flex items-start gap-3">
+                            <img 
+                                src="/images/calendar.png" 
+                                alt="calendar icon" 
+                                className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                                <p className="text-lime-950 text-xs font-light font-montserrat">Created</p>
+                                <p className="text-lime-950 text-sm font-semibold font-montserrat mt-1 break-words">
+                                    {formatDate(request.created_at)}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {/* Schedule */}
+                        <div className="flex items-start gap-3">
+                            <img 
+                                src="/images/clock.png" 
+                                alt="schedule icon" 
+                                className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                                <p className="text-lime-950 text-xs font-light font-montserrat">Schedule of Repair</p>
+                                <p className="text-lime-950 text-sm font-semibold font-montserrat mt-1 break-words">
+                                    {formatDate(request.schedule_date)}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Right Column */}
+                    <div className="space-y-6">
+                        {/* Requested By */}
+                        <div className="flex items-start gap-3">
+                            <img 
+                                src="/images/user.png" 
+                                alt="user icon" 
+                                className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                                <p className="text-lime-950 text-xs font-light font-montserrat">Requested by</p>
+                                <p className="text-lime-950 text-sm font-semibold font-montserrat mt-1 break-words">
+                                    {requesterName}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {/* Contact */}
+                        <div className="flex items-start gap-3">
+                            <img 
+                                src="/images/email.png" 
+                                alt="email icon" 
+                                className="w-5 h-5 sm:w-6 sm:h-6 mt-1 flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                                <p className="text-lime-950 text-xs font-light font-montserrat">Contact</p>
+                                <p className="text-lime-950 text-sm font-semibold font-montserrat mt-1 break-words">
+                                    {requesterEmail}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            </div>
-            
-            {/* Priority */}
-            <div className="h-6 px-5 py-2 bg-red-100 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center">
-            <div className="text-red-700 text-sm font-semibold font-electrolize leading-5 whitespace-nowrap">
-                {request.priority || 'Medium'}
-            </div>
-            </div>
-            
-            {/* Category */}
-            <div className="h-6 px-5 py-2 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-black inline-flex justify-center items-center">
-            <div className="text-black text-sm font-semibold font-electrolize leading-5 whitespace-nowrap">
-                {request.category}
-            </div>
-            </div>
-        </div>
-        
-        {/* Created */}
-        <div className="absolute left-[53.37px] top-[227px] w-20 text-lime-950 text-xs font-light leading-9 tracking-tight">
-            Created
-        </div>
-        <div className="absolute left-[53.37px] top-[245px] w-40 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {formatDate(request.created_at)}
-        </div>
-        <div className="absolute left-[18.98px] top-[240.68px]">
-            <img 
-            src="/images/calendar.png" 
-            alt="calendar icon" 
-            width={26}
-            height={26}
-            />
-        </div>
-        
-        {/* Schedule */}
-        <div className="absolute left-[54px] top-[291px] w-40 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            Schedule of Repair
-        </div>
-        <div className="absolute left-[54.42px] top-[309px] w-40 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {formatDate(request.schedule_date)}
-        </div>
-        <div className="absolute left-[20.98px] top-[307.75px]">
-            <img 
-            src="/images/clock.png" 
-            alt="schedule icon" 
-            width={22}
-            height={22}
-            />
-        </div>
-        
-        {/* L-Location */}
-        <div className="absolute left-[52.32px] top-[146px] w-20 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            Location
-        </div>
-        <div className="absolute left-[52.32px] top-[181px] w-44 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            {request.building || 'N/A'}
-        </div>
-        <div className="absolute left-[52.32px] top-[164px] w-36 h-9 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {request.location}
-        </div>
-        <div className="absolute left-[19.07px] top-[169.72px]">
-            <img 
-            src="/images/location.png" 
-            alt="location icon" 
-            width={24}
-            height={24}
-            />
-        </div>
-        
-        {/* Requested By */}
-        <div className="absolute left-[440.57px] top-[154px] w-24 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            Requested by
-        </div>
-        <div className="absolute left-[440.57px] top-[172px] w-36 h-9 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {requesterName}
-        </div>
-        <div className="absolute left-[405.25px] top-[170.75px]">
-            <img 
-            src="/images/user.png" 
-            alt="user icon" 
-            width={23}
-            height={23}
-            />
-        </div>
-        
-        {/* Contact */}
-        <div className="absolute left-[441.57px] top-[220px] w-20 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            Contact
-        </div>
-        <div className="absolute left-[441.57px] top-[238px] text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {requesterEmail}
-        </div>
-        <div className="absolute left-[405.26px] top-[234.69px]">
-            <img 
-            src="/images/email.png" 
-            alt="email icon" 
-            width={23}
-            height={23}
-            />
-        </div>
-        
-        {/* R-Location */}
-        <div className="absolute left-[441.38px] top-[277px] w-20 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            Location
-        </div>
-        <div className="absolute left-[442.38px] top-[312px] w-44 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            {request.building || 'N/A'}
-        </div>
-        <div className="absolute left-[441.38px] top-[295px] w-36 h-9 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {request.location}
-        </div>
-        <div className="absolute left-[405.13px] top-[300.72px]">
-            <img 
-            src="/images/location.png" 
-            alt="location icon" 
-            width={24}
-            height={24}
-            />
-        </div>
         </div>
     );
-    };
+};
 
-    export default RequestDetails;
+export default RequestDetails;

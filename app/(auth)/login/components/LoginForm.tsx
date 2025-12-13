@@ -1,28 +1,63 @@
 "use client";
 
-import Link from "next/link"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { login } from "@/lib/auth-actions"
-import SignInWithGoogleButton from "./SignInWithGoogleButton"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { createClient } from "@/utils/supabase/client";
 
 export function LoginForm() {
+  const router = useRouter();
+  const supabase = createClient();
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setError(null);
-    const result = await login(formData);
-    if (result?.error) {
-      setError(result.error);
+    setLoading(true);
+
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      setError(`Login failed: ${authError.message}`);
+      setLoading(false);
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profile")
+      .select("role")
+      .eq("email_address", email)
+      .single();
+
+    if (profileError || !profile?.role) {
+      setError("Profile not found or missing role. Please contact support.");
+      setLoading(false);
+      return;
+    }
+
+    const role = (profile.role as string).toLowerCase();
+    if (role === "personnel") {
+      router.push("/personnel/dashboard");
+    } else {
+      router.push("/requester/dashboard");
     }
   };
 
@@ -40,7 +75,7 @@ export function LoginForm() {
             <p className="text-sm text-red-800">{error}</p>
           </div>
         )}
-        <form action={handleSubmit}>
+        <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -61,10 +96,9 @@ export function LoginForm() {
                 </div>
                 <Input id="password" name="password" type="password" required />
               </div>
-              <Button type="submit" className="w-full font-electrolize">
-                LOGIN
+              <Button type="submit" className="w-full font-electrolize" disabled={loading}>
+                {loading ? "LOGGING IN..." : "LOGIN"}
               </Button>
-              <SignInWithGoogleButton/> 
             </div>
         </form>
         <div className="mt-4 text-center text-xs text-[#0D3311] font-electrolize">
