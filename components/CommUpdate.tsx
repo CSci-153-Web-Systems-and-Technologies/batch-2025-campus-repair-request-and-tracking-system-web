@@ -92,7 +92,7 @@ const CommunicationUpdates: React.FC<CommunicationUpdatesProps> = ({ requestId, 
         if (error) {
             console.error('send message error', error);
             setErrorMsg(error.message || 'Send failed. Please try again.');
-            setInput(text); // restore text for retry
+            setInput(text);
         }
         setSending(false);
     };
@@ -100,57 +100,82 @@ const CommunicationUpdates: React.FC<CommunicationUpdatesProps> = ({ requestId, 
     const formatTime = (ts: string) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     return (
-        <div className="w-full max-w-[788px] min-h-[192px] relative">
-            <div className="w-full h-full bg-neutral-100 rounded-2xl border border-lime-950 p-6">
-                <div className="font-electrolize text-lime-950 text-base font-semibold leading-9 tracking-wide">Communication and Updates</div>
-                <div className="text-lime-950 text-base leading-9 tracking-wide">Track progress updates and communicate</div>
+        <div className="w-full max-w-[788px] mx-4 sm:mx-6 lg:mx-auto">
+            <div className="bg-neutral-100 rounded-2xl border border-lime-950 p-4 sm:p-5 lg:p-6">
+                
+                {/* Header */}
+                <h2 className="font-electrolize text-lime-950 text-base sm:text-lg font-semibold leading-tight tracking-wide mb-1">
+                    Communication and Updates
+                </h2>
+                <p className="text-lime-950 text-sm sm:text-base leading-tight tracking-wide mb-4">
+                    Track progress updates and communicate
+                </p>
 
-                <div ref={listRef} className="mt-4 max-h-64 overflow-y-auto pr-1 space-y-3">
+                {/* Messages List */}
+                <div 
+                    ref={listRef} 
+                    className="max-h-64 sm:max-h-80 overflow-y-auto pr-1 sm:pr-2 space-y-3 mb-4"
+                >
                     {messages.map((msg) => {
                         const isSelf = msg.sender_id === currentUserId;
-                        const align = isSelf ? 'items-end text-right' : 'items-start text-left';
+                        const align = isSelf ? 'items-end' : 'items-start';
                         const bubble = isSelf ? 'bg-lime-900 text-white' : 'bg-white text-lime-950';
                         return (
                             <div key={msg.id} className={`flex flex-col ${align}`}>
-                                <div className={`inline-block px-3 py-2 rounded-xl border border-lime-950 ${bubble}`}>
-                                    <div className="text-xs font-semibold capitalize">{msg.sender_role}</div>
-                                    <div className="text-sm whitespace-pre-wrap break-words">{msg.text}</div>
+                                <div className={`inline-block max-w-[85%] sm:max-w-[75%] px-3 py-2 rounded-xl border border-lime-950 ${bubble}`}>
+                                    <div className="text-[10px] sm:text-xs font-semibold capitalize mb-1">
+                                        {msg.sender_role}
+                                    </div>
+                                    <div className="text-xs sm:text-sm whitespace-pre-wrap break-words">
+                                        {msg.text}
+                                    </div>
                                 </div>
-                                <span className="text-[10px] text-stone-500 mt-1">{formatTime(msg.created_at)}</span>
+                                <span className="text-[9px] sm:text-[10px] text-stone-500 mt-1 px-1">
+                                    {formatTime(msg.created_at)}
+                                </span>
                             </div>
                         );
                     })}
                     {messages.length === 0 && (
-                        <div className="text-xs text-stone-500">No messages yet.</div>
+                        <div className="text-xs text-stone-500 text-center py-4">
+                            No messages yet.
+                        </div>
                     )}
                 </div>
 
-                <div className="mt-4 flex gap-3">
+                {/* Input Area */}
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
+                            if (e.key === 'Enter' && !e.shiftKey) {
                                 e.preventDefault();
                                 handleSend();
                             }
                         }}
                         placeholder="Type your message..."
-                        className="flex-1 h-11 bg-zinc-300 rounded-lg px-3 text-lime-950 text-sm placeholder:text-lime-950 placeholder:opacity-60 focus:outline-none"
+                        className="flex-1 h-10 sm:h-11 bg-zinc-300 rounded-lg px-3 text-lime-950 text-sm placeholder:text-lime-950 placeholder:opacity-60 focus:outline-none focus:ring-2 focus:ring-lime-950"
                         disabled={sending}
                     />
-                    <div className="flex items-center">
-                        <button
-                            onClick={handleSend}
-                            disabled={sending || !currentUserId}
-                            className="w-20 h-8 rounded-[5px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border border-black/95 bg-white flex items-center justify-center hover:bg-gray-100 disabled:opacity-60"
-                        >
-                            <span className="text-lime-950 text-xs font-medium tracking-wider">SEND</span>
-                        </button>
-                    </div>
+                    <button
+                        onClick={handleSend}
+                        disabled={sending || !currentUserId}
+                        className="w-full sm:w-20 h-10 sm:h-8 rounded-[5px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border border-black/95 bg-white flex items-center justify-center hover:bg-gray-100 disabled:opacity-60 transition-colors"
+                    >
+                        <span className="text-lime-950 text-xs sm:text-sm font-medium tracking-wider">
+                            {sending ? 'SENDING...' : 'SEND'}
+                        </span>
+                    </button>
                 </div>
-                {errorMsg && <div className="mt-2 text-xs text-red-600">{errorMsg}</div>}
+                
+                {/* Error Message */}
+                {errorMsg && (
+                    <div className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded">
+                        {errorMsg}
+                    </div>
+                )}
             </div>
         </div>
     );

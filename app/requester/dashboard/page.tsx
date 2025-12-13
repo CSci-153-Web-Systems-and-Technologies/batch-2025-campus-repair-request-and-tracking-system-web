@@ -97,27 +97,33 @@ export default async function RequesterDashboard() {
     }
     
     return (
-        <div>        
-        <Header userName={user?.user_metadata?.full_name || 'User'} />
-        <div className="min-h-screen p-8 pt-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 ml-14 mr-14">
-            {statusCardsData.map((card) => (
-                <StatusCard
-                key={card.id}
-                count={card.count}
-                status={card.status}
-                iconSrc={card.iconSrc}
-                iconAlt={card.iconAlt}
-                />
-            ))}
+        <div className="min-h-screen bg-white">
+            <Header userName={user?.user_metadata?.full_name || 'User'} />
+            
+            <div className="px-4 md:px-8 pt-4 md:pt-6 pb-6">
+                {/* Status Cards Grid */}
+                <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10 mb-6 md:mb-8 md:ml-14 md:mr-14">
+                    {statusCardsData.map((card) => (
+                        <StatusCard
+                            key={card.id}
+                            count={card.count}
+                            status={card.status}
+                            iconSrc={card.iconSrc}
+                            iconAlt={card.iconAlt}
+                        />
+                    ))}
+                </div>
+                
+                {/* Submit Request Card */}
+                <div className="mb-6 md:mb-10 md:mx-14">
+                    <SubmitRequestCard />
+                </div>
+                
+                {/* Requests Container */}
+                <div className="md:mx-14">
+                    <RequestsContainer requests={requests} error={requestsError} />
+                </div>
             </div>
-            <div className="mx-4 sm:mx-6 lg:mx-8 mb-6 sm:mb-8 lg:mb-10">
-            <SubmitRequestCard />
-            </div>
-            <div className="pt-1 flex flex-wrap justify-center">
-            <RequestsContainer requests={requests} error={requestsError} />
-            </div>
-        </div>
         </div>
     );
-    }
+}

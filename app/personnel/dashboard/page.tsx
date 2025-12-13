@@ -64,8 +64,8 @@ export default async function PersonnelDashboard() {
     return (
         <div>        
         <Header userName={user?.user_metadata?.full_name || 'Personnel'} />
-        <div className="min-h-screen p-8 pt-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 ml-14 mr-14">
+        <div className="min-h-screen px-4 md:p-8 pt-4 md:pt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 pt-5 lg:grid-cols-4 gap-4 md:gap-10 md:ml-14 md:mr-14">
             {statusCardsData.map((card) => (
             <StatusCard
                 key={card.id}
@@ -76,8 +76,8 @@ export default async function PersonnelDashboard() {
             />
             ))}
         </div>
-        <div className="pt-10 flex pl-8 pr-8 flex-wrap justify-center">
-            <MainContainer   />
+        <div className="pt-6 md:pt-10 md:mx-14">
+            <MainContainer />
         </div>
 
         </div>

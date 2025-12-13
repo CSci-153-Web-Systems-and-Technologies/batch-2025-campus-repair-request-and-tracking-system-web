@@ -55,7 +55,8 @@ const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
     <div>
       <div className="w-full border-t border-gray-300 mb-3"></div>
       
-      <div className="relative w-full h-14 grid grid-cols-12 items-center px-6 gap-x-4">
+      {/* Desktop Layout - Hidden on mobile */}
+      <div className="hidden lg:grid relative w-full h-14 grid-cols-12 items-center px-6 gap-x-4">
 
       <div className="col-span-2 flex flex-col justify-center items-start">
         {/* request title and category */}
@@ -86,10 +87,9 @@ const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
       </div>
 
       {/* Status */}
-      <div className="col-span-2 relative h-6">
-        <div className="ml-5 w-full h-6 bg-neutral-200 rounded-2xl"></div>
+      <div className="col-span-2 flex items-center">
         <div
-          className={`ml-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-1 ${statusStyle.bg} rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] flex justify-center items-center whitespace-nowrap`}
+          className={`ml-5 px-4 py-1 ${statusStyle.bg} rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] flex justify-center items-center whitespace-nowrap`}
         >
           <div className="flex justify-center items-center gap-1">
             <div className={`${statusStyle.text} text-xs font-semibold font-electrolize`}>
@@ -140,6 +140,82 @@ const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
                 </div>
             </div>
             </button>
+        </div>
+      </div>
+
+      {/* Mobile Layout - Card Style */}
+      <div className="lg:hidden bg-white rounded-xl border border-lime-950 p-4 shadow-sm">
+        {/* Title and Category */}
+        <div className="mb-3">
+          <div className="text-lime-950 text-base font-light font-electrolize tracking-wide mb-2">
+            {request.title}
+          </div>
+          <div
+            className="inline-flex px-3 py-1 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-black"
+          >
+            <div className="text-black text-xs font-semibold font-electrolize">
+              {request.category}
+            </div>
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-2 mb-3">
+          <img
+            className="size-5"
+            src="/images/location.png"
+            alt="Location icon"
+          />
+          <div className="text-lime-950 text-sm font-semibold tracking-wide">
+            {request.location}
+          </div>
+        </div>
+
+        {/* Status and Priority Row */}
+        <div className="flex items-center gap-3 mb-3 flex-wrap">
+          <div
+            className={`px-3 py-1 ${statusStyle.bg} rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center`}
+          >
+            <div className={`${statusStyle.text} text-xs font-semibold font-electrolize`}>
+              {statusStyle.icon} {statusLabels[request.status.toLowerCase()] || request.status}
+            </div>
+          </div>
+
+          <div className="px-3 py-1 bg-red-100 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center">
+            <div className="text-red-700 text-xs font-semibold font-electrolize">
+              High
+            </div>
+          </div>
+        </div>
+
+        {/* Date and Action Row */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <img
+              className="size-5"
+              src="/images/calendar.png"
+              alt="Calendar icon"
+            />
+            <div className="text-lime-950 text-sm font-semibold tracking-wide">
+              {formatDate(request.created_at)}
+            </div>
+          </div>
+
+          <button
+            onClick={() => router.push(`/personnel/request-details?id=${request.id}`)}
+            className="px-4 py-1.5 bg-stone-300 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center hover:bg-stone-400 cursor-pointer transition-colors"
+          >
+            <div className="flex justify-start items-center gap-1">
+              <img
+                className="size-4"
+                src="/images/view.png"
+                alt="View icon"
+              />
+              <div className="text-semibold font-electrolize text-sm">
+                View
+              </div>
+            </div>
+          </button>
         </div>
       </div>
     </div>

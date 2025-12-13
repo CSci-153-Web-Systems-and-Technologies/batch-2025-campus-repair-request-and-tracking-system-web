@@ -68,99 +68,101 @@ export default function RequestContainer({ requests, error }: RequestContainerPr
         return matchesSearch && matchesStatus;
     }) || [];
 
-    const numRequests = filteredRequests.length;
-    const numRows = Math.ceil(numRequests / 4);
-    const cardHeight = 240;
-    const gap = 12;
-    const topSpacing = 150;
-    const bottomPadding = 24;
-    const containerHeight = topSpacing + (numRows * cardHeight) + ((numRows - 1) * gap) + bottomPadding;
-    const minHeight = Math.max(450, containerHeight);
-
     const selectedStatus = statusOptions.find(opt => opt.value === statusFilter)?.label || "All Status";
 
     return (
-        <div className="w-full max-w-[1326px] mx-auto relative pb-6" style={{ minHeight: `${minHeight}px` }}>
-            <div className="w-full h-full absolute bg-neutral-100 rounded-2xl border border-lime-950"></div>
-
-            <div className="absolute top-3 left-4 text-lime-950 text-sm font-semibold font-montserrat">
-                My Requests
-            </div>
-            <div className="absolute top-9 left-4 text-lime-950 text-xs font-light font-montserrat">
-                Easily track updates on your submitted repairs.
-            </div>
-
-            <div className="absolute top-20 left-4 w-[calc(100%-2rem)] flex items-center gap-2 z-10">
-                <div className="w-3/4 h-6 bg-neutral-200 rounded-xl border border-lime-950 relative flex items-center">
-                    <img
-                        className="absolute left-2 w-4 h-4"
-                        src="/images/search.png"
-                        alt="Search Icon"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Search requests..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full h-6 pl-8 text-xs text-black font-montserrat rounded-xl bg-transparent outline-none"
-                    />
+        <div className="w-full relative pb-6">
+            {/* Container Background */}
+            <div className="w-full min-h-[450px] bg-neutral-100 rounded-2xl border border-lime-950 p-4 sm:p-6">
+                
+                {/* Header */}
+                <div className="mb-4 sm:mb-6">
+                    <h2 className="text-lime-950 text-base sm:text-lg font-semibold font-montserrat mb-1">
+                        My Requests
+                    </h2>
+                    <p className="text-lime-950 text-xs sm:text-sm font-light font-montserrat">
+                        Easily track updates on your submitted repairs.
+                    </p>
                 </div>
 
-                <div className="w-1/4 relative">
-                    <button
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="w-full h-6 bg-neutral-200 rounded-xl border border-lime-950 flex items-center justify-between px-2"
-                    >
-                        <span className="text-xs text-lime-950 pl-3 font-light font-montserrat">
-                            {selectedStatus}
-                        </span>
+                {/* Search and Filter Section */}
+                <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                    {/* Search Bar */}
+                    <div className="w-full sm:flex-1 h-9 sm:h-10 bg-neutral-200 rounded-xl border border-lime-950 relative flex items-center">
                         <img
-                            className="w-4 h-4"
-                            src="/images/arrow.png"
-                            alt="Arrow Icon"
+                            className="absolute left-2 sm:left-3 w-4 h-4"
+                            src="/images/search.png"
+                            alt="Search Icon"
                         />
-                    </button>
-                    
-                    {isDropdownOpen && (
-                        <div className="absolute top-7 left-0 w-full bg-white border border-lime-950 rounded-xl shadow-lg z-20">
-                            {statusOptions.map((option) => (
-                                <button
-                                    key={option.value}
-                                    onClick={() => {
-                                        setStatusFilter(option.value);
-                                        setIsDropdownOpen(false);
-                                    }}
-                                    className="w-full px-3 py-2 text-xs text-left text-lime-950 font-montserrat hover:bg-neutral-100 first:rounded-t-xl last:rounded-b-xl"
-                                >
-                                    {option.label}
-                                </button>
-                            ))}
+                        <input
+                            type="text"
+                            placeholder="Search requests..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full h-full pl-8 sm:pl-10 pr-3 text-xs sm:text-sm text-black font-montserrat rounded-xl bg-transparent outline-none"
+                        />
+                    </div>
+
+                    {/* Status Filter Dropdown */}
+                    <div className="w-full sm:w-48 relative">
+                        <button
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            className="w-full h-9 sm:h-10 bg-neutral-200 rounded-xl border border-lime-950 flex items-center justify-between px-3 sm:px-4"
+                        >
+                            <span className="text-xs sm:text-sm text-lime-950 font-light font-montserrat truncate">
+                                {selectedStatus}
+                            </span>
+                            <img
+                                className="w-4 h-4 flex-shrink-0 ml-2"
+                                src="/images/arrow.png"
+                                alt="Arrow Icon"
+                            />
+                        </button>
+                        
+                        {isDropdownOpen && (
+                            <div className="absolute top-full mt-1 left-0 w-full bg-white border border-lime-950 rounded-xl shadow-lg z-20 overflow-hidden">
+                                {statusOptions.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        onClick={() => {
+                                            setStatusFilter(option.value);
+                                            setIsDropdownOpen(false);
+                                        }}
+                                        className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm text-left text-lime-950 font-montserrat hover:bg-neutral-100 transition-colors"
+                                    >
+                                        {option.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Requests Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                    {error && (
+                        <div className="col-span-full text-red-600 text-sm p-4 bg-red-50 rounded-lg">
+                            {error.message}
                         </div>
                     )}
+                    {!error && filteredRequests.length === 0 && (
+                        <div className="col-span-full text-sm text-lime-950 text-center py-8">
+                            {requests?.length === 0 ? "No requests yet." : "No requests match your search."}
+                        </div>
+                    )}
+                    {filteredRequests.map((req) => (
+                        <RequestsCard
+                            key={req.id}
+                            title={req.title}
+                            location={req.location}
+                            schedule={formatSchedule(req.created_at)}
+                            status={mapStatusToDisplay(req.status)}
+                            category={req.category}
+                            className="w-full h-56 sm:h-60"
+                            onClick={() => router.push(`/requester/request-details?id=${req.id}`)}
+                        />
+                    ))}
                 </div>
-            </div>
-
-            <div className="relative top-[150px] w-full px-4 grid grid-cols-4 gap-3 pb-4">
-                {error && (
-                    <div className="col-span-4 text-red-600 text-sm">{error.message}</div>
-                )}
-                {!error && filteredRequests.length === 0 && (
-                    <div className="col-span-4 text-sm text-lime-950">
-                        {requests?.length === 0 ? "No requests yet." : "No requests match your search."}
-                    </div>
-                )}
-                {filteredRequests.map((req) => (
-                    <RequestsCard
-                        key={req.id}
-                        title={req.title}
-                        location={req.location}
-                        schedule={formatSchedule(req.created_at)}
-                        status={mapStatusToDisplay(req.status)}
-                        category={req.category}
-                        className="w-full h-60"
-                        onClick={() => router.push(`/requester/request-details?id=${req.id}`)}
-                    />
-                ))}
             </div>
         </div>
     );

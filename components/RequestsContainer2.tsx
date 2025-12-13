@@ -105,14 +105,15 @@ return (
             <div className="relative w-full min-h-[500px] rounded-2xl">
             <div className="absolute inset-0 bg-neutral-100 rounded-2xl border border-lime-950"></div>
 
-            <div className="absolute left-12 right-0 top-0 h-10 px-6 z-10 grid grid-cols-12 items-center">
+            {/* Headers (desktop only) */}
+            <div className="hidden lg:grid absolute left-12 right-0 top-0 h-10 px-6 z-10 grid-cols-12 items-center">
                 <div className="col-span-2 text-lime-950 text-sm font-semibold truncate">
                 Request
                 </div>
                 <div className="ml-3 col-span-2 text-lime-950 text-sm font-semibold truncate">
                 Location
                 </div>
-                <div className="col-span-2 ml-14 text-lime-950 text-sm font-semibold truncate">
+                <div className="col-span-2 ml-5 text-lime-950 text-sm font-semibold truncate">
                 Status
                 </div>
                 <div className="col-span-2 text-lime-950 ml-16 text-sm font-semibold truncate">
@@ -126,24 +127,24 @@ return (
                 </div>
             </div>
 
-            <div className="absolute left-0 right-0 top-[40px] border border-black" />
+            <div className="hidden lg:block absolute left-0 right-0 top-[40px] border border-black" />
 
-            <div className="absolute top-[60px] left-0 right-0 bottom-0 overflow-y-auto px-4">
+            <div className="absolute top-0 lg:top-[60px] left-0 right-0 bottom-0 overflow-y-auto px-2 sm:px-4 pt-4 lg:pt-0">
                 {loading ? (
                     <div className="flex justify-center items-center h-32">
-                    <div className="text-lime-950 text-sm">Loading requests...</div>
+                        <div className="text-lime-950 text-sm">Loading requests...</div>
                     </div>
                 ) : filteredRequests.length === 0 ? (
                     <div className="flex justify-center items-center h-32">
-                    <div className="text-lime-950 text-sm">
-                        {isFiltered ? "No matching requests" : "No requests found"}
-                    </div>
+                        <div className="text-lime-950 text-sm">
+                            {isFiltered ? "No matching requests" : "No requests found"}
+                        </div>
                     </div>
                 ) : (
                     <div className="space-y-3">
-                    {filteredRequests.map((request) => (
-                        <RequestRow key={request.id} request={request} />
-                    ))}
+                        {filteredRequests.map((request) => (
+                            <RequestRow key={request.id} request={request} />
+                        ))}
                     </div>
                 )}
             </div>

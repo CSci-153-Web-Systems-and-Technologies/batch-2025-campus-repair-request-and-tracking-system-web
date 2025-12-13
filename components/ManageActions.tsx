@@ -71,141 +71,155 @@ const ManagementActions: React.FC<ManagementActionsProps> = ({ requestId }) => {
     };
 
     return (
-        <div className="w-full max-w-[788px] min-h-[192px] relative">
-
-        <div className="w-full h-full bg-neutral-100 rounded-2xl border border-lime-950 p-6">
-        
-            <div className="font-electrolize text-lime-950 text-base font-semibold leading-tight tracking-wide">
-            Management Actions
-            </div>
-            
-            <div className="text-lime-950 text-base leading-tight tracking-wide" style={{marginTop: '3px'}}>
-            Update requests, status, priority, and assignment
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-
-            {/* Status */}
-            <div className="flex flex-col">
-                <label className="text-lime-950 text-sm leading-9 font-semibold tracking-wide mb-1">
-                Status
-                </label>
-                <div className="relative dropdown-wrapper">
-                <button
-                    onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                    className={`w-full h-7 rounded-lg px-3 flex items-center justify-between ${
-                        status === 'submitted' ? 'bg-zinc-300' :
-                        status === 'under_review' ? 'bg-yellow-100' :
-                        status === 'in_progress' ? 'bg-sky-100' :
-                        status === 'completed' ? 'bg-green-100' :
-                        status === 'cancelled' ? 'bg-red-100' :
-                        'bg-zinc-300'
-                    }`}
-                >
-                    <span className="text-lime-950 text-xs">{status}</span>
-                    <img className="size-5" src="/images/arrow.png" alt="dropdown icon" />
-                </button>
-                {showStatusDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-lime-950 rounded-lg shadow-lg overflow-hidden">
-                    {['submitted', 'under_review', 'in_progress', 'completed', 'cancelled'].map((s) => {
-                        const bgColor = s === 'under_review' ? 'bg-yellow-100' : s === 'in_progress' ? 'bg-sky-100' : s === 'completed' ? 'bg-green-100' : s === 'cancelled' ? 'bg-red-100' : 'bg-zinc-300';
-                        return (
-                        <button
-                        key={s}
-                        onClick={() => handleStatusChange(s)}
-                        disabled={isUpdating}
-                        className={`w-full text-left px-3 py-2 text-xs hover:opacity-80 disabled:opacity-50 ${bgColor}`}
-                        >
-                        {s}
-                        </button>
-                        );
-                    })}
-                    </div>
-                )}
-                </div>
-            </div>
-            
-            {/* Priority */}
-            <div className="flex flex-col">
-                <label className="text-lime-950 text-sm font-semibold leading-9 tracking-wide mb-1">
-                Priority
-                </label>
-                <div className="relative dropdown-wrapper">
-                <button
-                    onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
-                    className={`w-full h-7 rounded-lg px-3 flex items-center justify-between ${
-                        priority === 'High' ? 'bg-red-100' :
-                        priority === 'Medium' ? 'bg-yellow-100' :
-                        priority === 'Low' ? 'bg-green-100' :
-                        'bg-zinc-300'
-                    }`}
-                >
-                    <span className="text-lime-950 text-xs">{priority}</span>
-                    <img className="size-5" src="/images/arrow.png" alt="dropdown icon" />
-                </button>
-                {showPriorityDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-lime-950 rounded-lg shadow-lg overflow-hidden">
-                    {['Low', 'Medium', 'High'].map((p) => {
-                        const bgColor = p === 'High' ? 'bg-red-100' : p === 'Medium' ? 'bg-yellow-100' : p === 'Low' ? 'bg-green-100' : '';
-                        return (
-                        <button
-                        key={p}
-                        onClick={() => { setPriority(p); setShowPriorityDropdown(false); }}
-                        className={`w-full text-left px-3 py-2 text-xs hover:opacity-80 ${bgColor}`}
-                        >
-                        {p}
-                        </button>
-                        );
-                    })}
-                    </div>
-                )}
-                </div>
-            </div>
-            
-            {/* Technician */}
-            <div className="flex flex-col">
-                <label className="text-lime-950 text-sm font-semibold leading-9 tracking-wide mb-1">
-                Assigned Technician
-                </label>
-                <input
-                type="text"
-                value={technician}
-                onChange={(e) => setTechnician(e.target.value)}
-                placeholder="Enter technician name"
-                className="w-full h-7 bg-zinc-300 rounded-lg px-3 text-lime-950 text-xs placeholder:text-lime-950 placeholder:opacity-60 focus:outline-none"
-                />
-            </div>
-            
-            {/* Schedule */}
-            <div className="flex flex-col">
-                <label className="text-lime-950 text-sm font-semibold leading-9 tracking-wide mb-1">
-                Schedule Repair
-                </label>
-                <input
-                type="date"
-                value={scheduleDate}
-                onChange={(e) => setScheduleDate(e.target.value)}
-                className="w-full h-7 bg-zinc-300 rounded-lg px-3 text-lime-950 text-xs focus:outline-none"
-                />
-            </div>
-            </div>
-            
-            {/* Update */}
-            <div className="flex flex-col items-center justify-center mt-6 gap-2">
-            <button 
-                onClick={handleUpdate}
-                disabled={isUpdating}
-                className="w-32 h-8 rounded-[5px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border border-black/95 bg-white flex items-center justify-center hover:bg-gray-100 disabled:opacity-50"
-            >
-                <span className="text-lime-950 text-xs font-medium">{isUpdating ? 'Updating...' : 'Update'}</span>
-            </button>
-            {updateMessage && (
-                <p className={`text-xs ${updateMessage.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
-                    {updateMessage}
+        <div className="w-full max-w-[788px] mx-4 sm:mx-6 lg:mx-auto">
+            <div className="bg-neutral-100 rounded-2xl border border-lime-950 p-4 sm:p-5 lg:p-6">
+                
+                {/* Header */}
+                <h2 className="font-electrolize text-lime-950 text-base sm:text-lg font-semibold leading-tight tracking-wide mb-1">
+                    Management Actions
+                </h2>
+                <p className="text-lime-950 text-sm sm:text-base leading-tight tracking-wide mb-4 sm:mb-6">
+                    Update requests, status, priority, and assignment
                 </p>
-            )}
+                
+                {/* Form Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    
+                    {/* Status Dropdown */}
+                    <div className="flex flex-col">
+                        <label className="text-lime-950 text-sm font-semibold leading-tight tracking-wide mb-2">
+                            Status
+                        </label>
+                        <div className="relative dropdown-wrapper">
+                            <button
+                                onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                                className={`w-full h-9 sm:h-8 rounded-lg px-3 flex items-center justify-between transition-colors ${
+                                    status === 'submitted' ? 'bg-zinc-300' :
+                                    status === 'under_review' ? 'bg-yellow-100' :
+                                    status === 'in_progress' ? 'bg-sky-100' :
+                                    status === 'completed' ? 'bg-green-100' :
+                                    status === 'cancelled' ? 'bg-red-100' :
+                                    'bg-zinc-300'
+                                }`}
+                            >
+                                <span className="text-lime-950 text-xs sm:text-sm truncate">{status}</span>
+                                <img className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ml-2" src="/images/arrow.png" alt="dropdown icon" />
+                            </button>
+                            {showStatusDropdown && (
+                                <div className="absolute z-20 w-full mt-1 bg-white border border-lime-950 rounded-lg shadow-lg overflow-hidden">
+                                    {['submitted', 'under_review', 'in_progress', 'completed', 'cancelled'].map((s) => {
+                                        const bgColor = 
+                                            s === 'under_review' ? 'bg-yellow-100' : 
+                                            s === 'in_progress' ? 'bg-sky-100' : 
+                                            s === 'completed' ? 'bg-green-100' : 
+                                            s === 'cancelled' ? 'bg-red-100' : 
+                                            'bg-zinc-300';
+                                        return (
+                                            <button
+                                                key={s}
+                                                onClick={() => handleStatusChange(s)}
+                                                disabled={isUpdating}
+                                                className={`w-full text-left px-3 py-2 text-xs sm:text-sm hover:opacity-80 disabled:opacity-50 transition-opacity ${bgColor}`}
+                                            >
+                                                {s}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {/* Priority Dropdown */}
+                    <div className="flex flex-col">
+                        <label className="text-lime-950 text-sm font-semibold leading-tight tracking-wide mb-2">
+                            Priority
+                        </label>
+                        <div className="relative dropdown-wrapper">
+                            <button
+                                onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
+                                className={`w-full h-9 sm:h-8 rounded-lg px-3 flex items-center justify-between transition-colors ${
+                                    priority === 'High' ? 'bg-red-100' :
+                                    priority === 'Medium' ? 'bg-yellow-100' :
+                                    priority === 'Low' ? 'bg-green-100' :
+                                    'bg-zinc-300'
+                                }`}
+                            >
+                                <span className="text-lime-950 text-xs sm:text-sm truncate">{priority}</span>
+                                <img className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ml-2" src="/images/arrow.png" alt="dropdown icon" />
+                            </button>
+                            {showPriorityDropdown && (
+                                <div className="absolute z-20 w-full mt-1 bg-white border border-lime-950 rounded-lg shadow-lg overflow-hidden">
+                                    {['Low', 'Medium', 'High'].map((p) => {
+                                        const bgColor = 
+                                            p === 'High' ? 'bg-red-100' : 
+                                            p === 'Medium' ? 'bg-yellow-100' : 
+                                            p === 'Low' ? 'bg-green-100' : 
+                                            '';
+                                        return (
+                                            <button
+                                                key={p}
+                                                onClick={() => { 
+                                                    setPriority(p); 
+                                                    setShowPriorityDropdown(false); 
+                                                }}
+                                                className={`w-full text-left px-3 py-2 text-xs sm:text-sm hover:opacity-80 transition-opacity ${bgColor}`}
+                                            >
+                                                {p}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {/* Technician Input */}
+                    <div className="flex flex-col">
+                        <label className="text-lime-950 text-sm font-semibold leading-tight tracking-wide mb-2">
+                            Assigned Technician
+                        </label>
+                        <input
+                            type="text"
+                            value={technician}
+                            onChange={(e) => setTechnician(e.target.value)}
+                            placeholder="Enter technician name"
+                            className="w-full h-9 sm:h-8 bg-zinc-300 rounded-lg px-3 text-lime-950 text-xs sm:text-sm placeholder:text-lime-950 placeholder:opacity-60 focus:outline-none focus:ring-2 focus:ring-lime-950"
+                        />
+                    </div>
+                    
+                    {/* Schedule Input */}
+                    <div className="flex flex-col">
+                        <label className="text-lime-950 text-sm font-semibold leading-tight tracking-wide mb-2">
+                            Schedule Repair
+                        </label>
+                        <input
+                            type="date"
+                            value={scheduleDate}
+                            onChange={(e) => setScheduleDate(e.target.value)}
+                            className="w-full h-9 sm:h-8 bg-zinc-300 rounded-lg px-3 text-lime-950 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-lime-950"
+                        />
+                    </div>
+                </div>
+                
+                {/* Update Button and Message */}
+                <div className="flex flex-col items-center justify-center mt-6 gap-3">
+                    <button 
+                        onClick={handleUpdate}
+                        disabled={isUpdating}
+                        className="w-full sm:w-32 h-10 sm:h-9 rounded-[5px] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] border border-black/95 bg-white flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 transition-colors"
+                    >
+                        <span className="text-lime-950 text-xs sm:text-sm font-medium">
+                            {isUpdating ? 'Updating...' : 'Update'}
+                        </span>
+                    </button>
+                    {updateMessage && (
+                        <p className={`text-xs sm:text-sm text-center ${updateMessage.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+                            {updateMessage}
+                        </p>
+                    )}
+                </div>
             </div>
-        </div>
         </div>
     );
 };

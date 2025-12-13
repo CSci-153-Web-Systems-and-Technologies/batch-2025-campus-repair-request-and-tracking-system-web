@@ -76,7 +76,7 @@ const MainContainer = () => {
                         ? statusLabels[value] || value
                         : value}
                 </span>
-                <img className="size-5" src="/images/arrow.png" alt="Dropdown icon" />
+                <img className="size-5 flex-shrink-0" src="/images/arrow.png" alt="Dropdown icon" />
             </button>
             {openDropdown === type && (
                 <div className="absolute z-20 mt-2 w-full bg-white border border-lime-950 rounded-xl shadow-sm max-h-64 overflow-y-auto">
@@ -98,20 +98,20 @@ const MainContainer = () => {
     );
 
     return (
-        <div className="w-full max-w-[1520px] min-h-[499px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative w-full min-h-[700px] bg-neutral-100 rounded-2xl border border-lime-950 p-8">
+        <div className="w-full min-h-[499px]">
+            <div className="relative w-full min-h-[700px] bg-neutral-100 rounded-2xl border border-lime-950 p-4 sm:p-8">
 
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
                     <div>
-                        <h1 className="text-lime-950 text-xl font-electrolize tracking-wider font-semibold">All Requests</h1>
-                        <p className="text-lime-950 text-sm font-light mt-2">Manage and track repair requests</p>
+                        <h1 className="text-lime-950 text-lg sm:text-xl font-electrolize tracking-wider font-semibold">All Requests</h1>
+                        <p className="text-lime-950 text-xs sm:text-sm font-light mt-2">Manage and track repair requests</p>
                         {activeFiltersLabel && (
-                            <p className="text-xs text-stone-600 mt-2">{activeFiltersLabel}</p>
+                            <p className="text-xs text-stone-600 mt-2 break-words">{activeFiltersLabel}</p>
                         )}
                     </div>
                 </div>
 
-                <div className="flex flex-wrap gap-4 mb-8">
+                <div className="flex flex-col lg:flex-row flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
                     {/* Search */}
                     <div className="relative flex-1 min-w-[280px]">
                         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -134,16 +134,16 @@ const MainContainer = () => {
                     {/* Category */}
                     {renderDropdown("category", categoryOptions, category, setCategory)}
 
-                    {/* Priority placeholder - unchanged */}
+                    {/* Priority placeholder */}
                     <div className="relative min-w-[200px]">
                         <button className="w-full h-12 px-4 bg-neutral-200 rounded-2xl border border-lime-950 flex items-center justify-between" disabled>
                             <span className="text-lime-950 text-sm font-light">All Priorities</span>
-                            <img className="size-5" src="/images/arrow.png" alt="Dropdown icon" />
+                            <img className="size-5 flex-shrink-0" src="/images/arrow.png" alt="Dropdown icon" />
                         </button>
                     </div>
                 </div>
 
-                <div className="w-full">
+                <div className="w-full overflow-x-auto">
                     <RequestContainer2
                         search={search}
                         status={status === "All" ? "all" : status}

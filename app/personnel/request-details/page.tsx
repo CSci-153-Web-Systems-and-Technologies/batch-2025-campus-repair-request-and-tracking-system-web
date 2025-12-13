@@ -3,12 +3,13 @@ import Header2 from "@/components/Header2";
 import ManagementActions from "@/components/ManageActions";
 import RequestDetails from "@/components/RequestDetails";
 
-export default function RequestDetailsPage({
+export default async function RequestDetailsPage({
   searchParams,
 }: {
-  searchParams: { id?: string };
+  searchParams: Promise<{ id?: string }>;
 }) {
-  const requestId = searchParams.id;
+  const params = await searchParams;
+  const requestId = params.id;
 
   if (!requestId) {
     return (
