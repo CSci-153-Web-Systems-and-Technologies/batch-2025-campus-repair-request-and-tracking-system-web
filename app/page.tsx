@@ -31,7 +31,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <div className="relative flex justify-center items-center order-1 lg:order-2 mt-0 lg:mt-0 hidden sm:flex">
+          <div className="relative flex justify-center items-center order-1 lg:order-2 hidden sm:flex">
             <div className="relative w-[400px] h-[400px] lg:w-[500px] lg:h-[500px] animate-[float_6s_ease-in-out_infinite]">
               <img 
                 src="/images/cover.png" 

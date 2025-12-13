@@ -79,9 +79,8 @@ export function SignUpForm() {
           <CardTitle className="text-2xl text-[#0D3311] font-electrolize tracking-wide">Sign Up</CardTitle>
         )}
         <CardDescription>
-          Step {step} of 3
-          <br />
-          Enter your information to create an account
+          <div>{step}/3</div>
+          <div>Enter your information to create an account</div>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -233,7 +232,7 @@ export function SignUpForm() {
             </div>
           )}
         </form>
-        <div className="mt-4 text-center text-xs text-[#0D3311] font-electrolize">
+        <div className="mt-4 nt text-xs text-[#0D3311] font-electrolize">
           Already have an account?{" "}
           <Link href="/login" className="underline">
             Sign in
