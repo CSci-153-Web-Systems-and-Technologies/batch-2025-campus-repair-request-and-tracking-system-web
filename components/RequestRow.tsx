@@ -1,0 +1,225 @@
+"use client";
+import React from "react";
+import { useRouter } from "next/navigation";
+
+interface RequestRowProps {
+  request: {
+    id: string;
+    title: string;
+    category: string;
+    location: string;
+    status: string;
+    created_at: string;
+  };
+}
+
+const statusLabels: { [key: string]: string } = {
+  "pending": "Pending",
+  "submitted": "Pending",
+  "under_review": "Pending",
+  "in_progress": "In Progress",
+  "completed": "Completed",
+  "cancelled": "Cancelled",
+};
+
+const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
+  const router = useRouter();
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-2);
+    return `${month}/${day}/${year}`;
+  };
+
+  const getStatusStyle = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return { bg: 'bg-green-100', text: 'text-green-600', icon: '✅' };
+      case 'pending':
+      case 'submitted':
+      case 'under_review':
+        return { bg: 'bg-amber-100', text: 'text-orange-500', icon: '⏳' };
+      case 'in_progress':
+        return { bg: 'bg-blue-100', text: 'text-blue-600', icon: '🔨' };
+      case 'cancelled':
+        return { bg: 'bg-red-100', text: 'text-red-600', icon: '❌' };
+      default:
+        return { bg: 'bg-gray-100', text: 'text-gray-600', icon: '' };
+    }
+  };
+
+  const statusStyle = getStatusStyle(request.status);
+
+  return (
+    <div>
+      <div className="w-full border-t border-gray-300 mb-3"></div>
+      
+      {/* Desktop Layout - Hidden on mobile */}
+      <div className="hidden lg:grid relative w-full h-14 grid-cols-12 items-center px-6 gap-x-4">
+
+      <div className="col-span-2 flex flex-col justify-center items-start">
+        {/* request title and category */}
+        <div className="text-lime-950 text-base font-light font-electrolize leading-9 tracking-wide truncate w-full">
+          {request.title}
+        </div>
+        <div
+          className="w-24 h-6 px-5 py-2 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-black inline-flex justify-center items-center"
+        >
+          <div className="flex justify-start items-start gap-2">
+            <div className="text-black text-sm font-semibold font-electrolize leading-5 truncate">
+              {request.category}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* location */}
+      <div className="col-span-2 flex items-center gap-2 -ml-4">
+        <img
+          className="size-5"
+          src="/images/location.png"
+          alt="Location icon"
+        />
+        <div className="text-lime-950 text-sm font-semibold tracking-wide truncate">
+          {request.location}
+        </div>
+      </div>
+
+      {/* Status */}
+      <div className="col-span-2 flex items-center">
+        <div
+          className={`ml-5 px-4 py-1 ${statusStyle.bg} rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] flex justify-center items-center whitespace-nowrap`}
+        >
+          <div className="flex justify-center items-center gap-1">
+            <div className={`${statusStyle.text} text-xs font-semibold font-electrolize`}>
+              {statusStyle.icon} {statusLabels[request.status.toLowerCase()] || request.status}
+            </div>
+          </div>
+        </div>
+      </div>
+
+        
+        <div className="ml-14 col-span-2 flex items-center justify-center">
+            <div
+            className="w-20 h-6 px-5 py-2 bg-red-100 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center"
+            >
+            <div className="flex justify-start items-center gap-2">
+                <div className="text-red-700 text-sm font-semibold font-electrolize leading-5">
+                High
+                </div>
+            </div>
+            </div>
+        </div>
+
+      {/* Date */}
+      <div className="ml-11 col-span-2 flex items-center justify-start gap-2">
+        <img
+          className="size-6"
+          src="/images/calendar.png"
+          alt="Calendar icon"
+        />
+        <div className="text-lime-950 text-sm font-semibold leading-9 tracking-wide truncate">
+          {formatDate(request.created_at)}
+        </div>
+      </div>
+
+        <div className="ml-8 col-span-2 flex items-center justify-start gap-2">
+            <button
+            onClick={() => router.push(`/personnel/request-details?id=${request.id}`)}
+            className="w-24 h-6 px-5 py-2 bg-stone-300 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center hover:bg-stone-400 cursor-pointer transition-colors"
+            >
+            <div className=" flex justify-start items-center row-2 gap-1">
+                <img
+                className="size-4"
+                src="/images/view.png"
+                alt="View icon"
+                />
+                <div className="text-semibold font-electrolize text-sm leading-5">
+                View
+                </div>
+            </div>
+            </button>
+        </div>
+      </div>
+
+      {/* Mobile Layout - Card Style */}
+      <div className="lg:hidden bg-white rounded-xl border border-lime-950 p-4 shadow-sm">
+        {/* Title and Category */}
+        <div className="mb-3">
+          <div className="text-lime-950 text-base font-light font-electrolize tracking-wide mb-2">
+            {request.title}
+          </div>
+          <div
+            className="inline-flex px-3 py-1 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] outline outline-1 outline-offset-[-1px] outline-black"
+          >
+            <div className="text-black text-xs font-semibold font-electrolize">
+              {request.category}
+            </div>
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-2 mb-3">
+          <img
+            className="size-5"
+            src="/images/location.png"
+            alt="Location icon"
+          />
+          <div className="text-lime-950 text-sm font-semibold tracking-wide">
+            {request.location}
+          </div>
+        </div>
+
+        {/* Status and Priority Row */}
+        <div className="flex items-center gap-3 mb-3 flex-wrap">
+          <div
+            className={`px-3 py-1 ${statusStyle.bg} rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center`}
+          >
+            <div className={`${statusStyle.text} text-xs font-semibold font-electrolize`}>
+              {statusStyle.icon} {statusLabels[request.status.toLowerCase()] || request.status}
+            </div>
+          </div>
+
+          <div className="px-3 py-1 bg-red-100 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center">
+            <div className="text-red-700 text-xs font-semibold font-electrolize">
+              High
+            </div>
+          </div>
+        </div>
+
+        {/* Date and Action Row */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <img
+              className="size-5"
+              src="/images/calendar.png"
+              alt="Calendar icon"
+            />
+            <div className="text-lime-950 text-sm font-semibold tracking-wide">
+              {formatDate(request.created_at)}
+            </div>
+          </div>
+
+          <button
+            onClick={() => router.push(`/personnel/request-details?id=${request.id}`)}
+            className="px-4 py-1.5 bg-stone-300 rounded-3xl shadow-[0px_4px_8px_0px_rgba(0,0,0,0.10)] inline-flex justify-center items-center hover:bg-stone-400 cursor-pointer transition-colors"
+          >
+            <div className="flex justify-start items-center gap-1">
+              <img
+                className="size-4"
+                src="/images/view.png"
+                alt="View icon"
+              />
+              <div className="text-semibold font-electrolize text-sm">
+                View
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default RequestRow;
