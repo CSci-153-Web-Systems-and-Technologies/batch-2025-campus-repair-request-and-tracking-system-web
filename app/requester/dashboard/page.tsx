@@ -64,6 +64,20 @@ export default async function RequesterDashboard() {
         },
     ];
     
+    let requests: any[] = [];
+    let requestsError: any = null;
+    
+    if (user) {
+        const result = await supabase
+            .from('requests')
+            .select('id, title, category, location, status, created_at')
+            .eq('requester_id', user.id)
+            .order('created_at', { ascending: false });
+        
+        requests = result.data || [];
+        requestsError = result.error;
+    }
+    
     return (
         <div>        
         <Header userName={user?.user_metadata?.full_name || 'User'} />
@@ -83,7 +97,7 @@ export default async function RequesterDashboard() {
             <SubmitRequestCard />
             </div>
             <div className="pt-1 flex flex-wrap justify-center">
-            <RequestsContainer />
+            <RequestsContainer requests={requests} error={requestsError} />
             </div>
         </div>
         </div>

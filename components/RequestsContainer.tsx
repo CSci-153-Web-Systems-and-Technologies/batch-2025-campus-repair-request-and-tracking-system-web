@@ -1,5 +1,7 @@
+'use client';
+
+import { useState } from "react";
 import RequestsCard from "@/components/RequestsCard";
-import { createClient } from "@/utils/supabase/server";
 
 type RequestRow = {
     id: string;
@@ -16,27 +18,55 @@ function formatSchedule(dateString?: string) {
     return `Created on ${date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
 }
 
-export default async function RequestContainer() {
-    const supabase = createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+function mapStatusToDisplay(status: string): 'Pending' | 'In Progress' | 'Completed' | 'Cancelled' {
+    const statusMap: Record<string, 'Pending' | 'In Progress' | 'Completed' | 'Cancelled'> = {
+        'pending': 'Pending',
+        'submitted': 'Pending',
+        'under_review': 'Pending',
+        'in_progress': 'In Progress',
+        'completed': 'Completed',
+        'cancelled': 'Cancelled',
+    };
+    return statusMap[status] || 'Pending';
+}
 
-    if (!user) {
-        return (
-            <div className="w-full max-w-[1326px] mx-auto h-[450px] relative flex items-center justify-center text-sm text-red-600">
-                Please sign in to view your requests.
-            </div>
-        );
-    }
+interface RequestContainerProps {
+    requests: RequestRow[];
+    error: any;
+}
 
-    const { data: requests, error } = await supabase
-        .from("requests")
-        .select("id, title, category, location, status, created_at")
-        .eq("requester_id", user.id)
-        .order("created_at", { ascending: false });
+export default function RequestContainer({ requests, error }: RequestContainerProps) {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const numRequests = requests?.length || 0;
+    const statusOptions = [
+        { value: "all", label: "All Status" },
+        { value: "pending", label: "Pending" },
+        { value: "in_progress", label: "In Progress" },
+        { value: "completed", label: "Completed" },
+        { value: "cancelled", label: "Cancelled" },
+    ];
+
+    const filteredRequests = requests?.filter((req) => {
+        const matchesSearch = 
+            req.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            req.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            req.category?.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        let matchesStatus = false;
+        if (statusFilter === "all") {
+            matchesStatus = true;
+        } else if (statusFilter === "pending") {
+            matchesStatus = req.status === 'submitted' || req.status === 'under_review' || req.status === 'pending';
+        } else {
+            matchesStatus = req.status === statusFilter;
+        }
+        
+        return matchesSearch && matchesStatus;
+    }) || [];
+
+    const numRequests = filteredRequests.length;
     const numRows = Math.ceil(numRequests / 4);
     const cardHeight = 240;
     const gap = 12;
@@ -44,6 +74,8 @@ export default async function RequestContainer() {
     const bottomPadding = 24;
     const containerHeight = topSpacing + (numRows * cardHeight) + ((numRows - 1) * gap) + bottomPadding;
     const minHeight = Math.max(450, containerHeight);
+
+    const selectedStatus = statusOptions.find(opt => opt.value === statusFilter)?.label || "All Status";
 
     return (
         <div className="w-full max-w-[1326px] mx-auto relative pb-6" style={{ minHeight: `${minHeight}px` }}>
@@ -56,7 +88,7 @@ export default async function RequestContainer() {
                 Easily track updates on your submitted repairs.
             </div>
 
-            <div className="absolute top-20 left-4 w-[calc(100%-2rem)] flex items-center gap-2">
+            <div className="absolute top-20 left-4 w-[calc(100%-2rem)] flex items-center gap-2 z-10">
                 <div className="w-3/4 h-6 bg-neutral-200 rounded-xl border border-lime-950 relative flex items-center">
                     <img
                         className="absolute left-2 w-4 h-4"
@@ -66,20 +98,43 @@ export default async function RequestContainer() {
                     <input
                         type="text"
                         placeholder="Search requests..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full h-6 pl-8 text-xs text-black font-montserrat rounded-xl bg-transparent outline-none"
-                        readOnly
                     />
                 </div>
 
-                <div className="w-1/4 h-6 bg-neutral-200 rounded-xl border border-lime-950 flex items-center justify-between px-2 relative">
-                    <span className="text-xs text-lime-950 pl-3 font-light font-montserrat">
-                        All Status
-                    </span>
-                    <img
-                        className="w-4 h-4"
-                        src="/images/arrow.png"
-                        alt="Arrow Icon"
-                    />
+                <div className="w-1/4 relative">
+                    <button
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="w-full h-6 bg-neutral-200 rounded-xl border border-lime-950 flex items-center justify-between px-2"
+                    >
+                        <span className="text-xs text-lime-950 pl-3 font-light font-montserrat">
+                            {selectedStatus}
+                        </span>
+                        <img
+                            className="w-4 h-4"
+                            src="/images/arrow.png"
+                            alt="Arrow Icon"
+                        />
+                    </button>
+                    
+                    {isDropdownOpen && (
+                        <div className="absolute top-7 left-0 w-full bg-white border border-lime-950 rounded-xl shadow-lg z-20">
+                            {statusOptions.map((option) => (
+                                <button
+                                    key={option.value}
+                                    onClick={() => {
+                                        setStatusFilter(option.value);
+                                        setIsDropdownOpen(false);
+                                    }}
+                                    className="w-full px-3 py-2 text-xs text-left text-lime-950 font-montserrat hover:bg-neutral-100 first:rounded-t-xl last:rounded-b-xl"
+                                >
+                                    {option.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -87,16 +142,18 @@ export default async function RequestContainer() {
                 {error && (
                     <div className="col-span-4 text-red-600 text-sm">{error.message}</div>
                 )}
-                {!error && (!requests || requests.length === 0) && (
-                    <div className="col-span-4 text-sm text-lime-950">No requests yet.</div>
+                {!error && filteredRequests.length === 0 && (
+                    <div className="col-span-4 text-sm text-lime-950">
+                        {requests?.length === 0 ? "No requests yet." : "No requests match your search."}
+                    </div>
                 )}
-                {requests?.map((req) => (
+                {filteredRequests.map((req) => (
                     <RequestsCard
                         key={req.id}
                         title={req.title}
                         location={req.location}
                         schedule={formatSchedule(req.created_at)}
-                        status={req.status as any}
+                        status={mapStatusToDisplay(req.status)}
                         category={req.category}
                         className="w-full h-60"
                     />
