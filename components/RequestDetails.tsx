@@ -73,13 +73,13 @@ interface RequestDetailsProps {
         <div className="absolute left-0 top-0 w-[788px] h-96 bg-neutral-100 rounded-2xl border border-lime-950" />
         
         {/* Title */}
-        <div className="absolute left-[24.07px] font-electrolize top-[18px] w-40 h-12 text-lime-950 text-base font-semibold leading-9 tracking-wide">
+        <div className="absolute left-[24.07px] right-[24.07px] font-electrolize top-[18px] text-lime-950 text-base font-semibold leading-9 tracking-wide whitespace-normal break-words pr-4">
             {request.title}
         </div>
         
         {/* Description */}
-        <div className="text-lime-950 text-base leading-9 tracking-wide absolute left-[24.07px] top-[43px] w-96 ">
-            {request.description || 'No description provided'}
+        <div className="text-lime-950 text-base leading-9 tracking-wide absolute left-[24.07px] right-[24.07px] top-[43px] whitespace-normal break-words pr-4">
+            {request.description ?? ''}
         </div>
         
         {/* Status, Priority, Category - Responsive Container */}
@@ -107,7 +107,7 @@ interface RequestDetailsProps {
         </div>
         
         {/* Created */}
-        <div className="absolute left-[53.37px] top-[227px] w-20 text-lime-950 text-xs font-light leading-9 tracking-tight">
+        <div className="absolute left-[53.37px] top-[225px] w-20 text-lime-950 text-xs font-light leading-9 tracking-tight">
             Created
         </div>
         <div className="absolute left-[53.37px] top-[245px] w-40 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
@@ -143,7 +143,7 @@ interface RequestDetailsProps {
             Location
         </div>
         <div className="absolute left-[52.32px] top-[181px] w-44 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            {request.building || 'N/A'}
+            {request.building || ''}
         </div>
         <div className="absolute left-[52.32px] top-[164px] w-36 h-9 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
             {request.location}
@@ -189,24 +189,6 @@ interface RequestDetailsProps {
             />
         </div>
         
-        {/* R-Location */}
-        <div className="absolute left-[441.38px] top-[277px] w-20 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            Location
-        </div>
-        <div className="absolute left-[442.38px] top-[312px] w-44 text-lime-950 text-xs font-light font-montserrat leading-9 tracking-tight">
-            {request.building || 'N/A'}
-        </div>
-        <div className="absolute left-[441.38px] top-[295px] w-36 h-9 text-lime-950 text-sm font-semibold font-montserrat leading-9 tracking-wide">
-            {request.location}
-        </div>
-        <div className="absolute left-[405.13px] top-[300.72px]">
-            <img 
-            src="/images/location.png" 
-            alt="location icon" 
-            width={24}
-            height={24}
-            />
-        </div>
         </div>
     );
     };

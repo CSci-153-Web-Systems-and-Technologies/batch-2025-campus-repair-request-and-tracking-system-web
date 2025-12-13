@@ -34,13 +34,30 @@ const RequestContainer2: React.FC<RequestContainer2Props> = ({
         const supabase = createClient();
         const { data, error } = await supabase
             .from('requests')
-            .select('id, title, category, location, status, created_at')
+            .select(`
+                id, 
+                title, 
+                location, 
+                status, 
+                created_at,
+                request_categories(
+                    categories(name)
+                )
+            `)
             .order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error fetching requests:', error);
         } else {
-            setRequests(data || []);
+            const formattedData = (data || []).map((req: any) => ({
+                id: req.id,
+                title: req.title,
+                location: req.location,
+                status: req.status,
+                created_at: req.created_at,
+                category: req.request_categories?.[0]?.categories?.name || 'Uncategorized'
+            }));
+            setRequests(formattedData);
         }
         setLoading(false);
     };
@@ -59,16 +76,21 @@ const RequestContainer2: React.FC<RequestContainer2Props> = ({
                 ? req.title.toLowerCase().includes(query) || req.category.toLowerCase().includes(query) || req.location.toLowerCase().includes(query)
                 : true;
 
-            const matchesStatus = statusFilter && statusFilter !== "all"
-                ? req.status.toLowerCase() === statusFilter
-                : true;
+            let matchesStatus = true;
+            if (statusFilter && statusFilter !== "all") {
+                if (statusFilter === "pending") {
+                    matchesStatus = req.status === 'submitted' || req.status === 'under_review' || req.status === 'pending';
+                } else {
+                    matchesStatus = req.status.toLowerCase() === statusFilter;
+                }
+            }
 
             const matchesDepartment = departmentFilter && departmentFilter !== "all"
                 ? req.location.toLowerCase().includes(departmentFilter)
                 : true;
 
             const matchesCategory = categoryFilter && categoryFilter !== "all"
-                ? req.category.toLowerCase().includes(categoryFilter)
+                ? req.category.toLowerCase() === categoryFilter
                 : true;
 
             return matchesQuery && matchesStatus && matchesDepartment && matchesCategory;

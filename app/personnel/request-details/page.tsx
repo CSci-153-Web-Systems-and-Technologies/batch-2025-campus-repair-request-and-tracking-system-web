@@ -38,7 +38,7 @@ export default function RequestDetailsPage({
       </div>
 
       <div className="flex items-center justify-center">
-        <CommunicationUpdates />
+        <CommunicationUpdates requestId={requestId} role="personnel" />
       </div>
     </div>
   );

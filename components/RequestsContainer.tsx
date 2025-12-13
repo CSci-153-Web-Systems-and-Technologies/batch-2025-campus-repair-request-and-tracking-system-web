@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import RequestsCard from "@/components/RequestsCard";
 
 type RequestRow = {
@@ -36,6 +37,7 @@ interface RequestContainerProps {
 }
 
 export default function RequestContainer({ requests, error }: RequestContainerProps) {
+    const router = useRouter();
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -156,6 +158,7 @@ export default function RequestContainer({ requests, error }: RequestContainerPr
                         status={mapStatusToDisplay(req.status)}
                         category={req.category}
                         className="w-full h-60"
+                        onClick={() => router.push(`/requester/request-details?id=${req.id}`)}
                     />
                 ))}
             </div>

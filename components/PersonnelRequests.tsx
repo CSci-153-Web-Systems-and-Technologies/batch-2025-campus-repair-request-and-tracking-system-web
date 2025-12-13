@@ -4,10 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import RequestContainer2 from '@/components/RequestsContainer2';
 import { createClient } from '@/utils/supabase/client';
 
-const statusOptions = ["All", "submitted", "under_review", "in_progress", "completed", "cancelled"];
+const statusOptions = ["All", "pending", "in_progress", "completed", "cancelled"];
 const statusLabels: { [key: string]: string } = {
-    "submitted": "Submitted",
-    "under_review": "Under Review",
+    "pending": "Pending",
     "in_progress": "In Progress",
     "completed": "Completed",
     "cancelled": "Cancelled",

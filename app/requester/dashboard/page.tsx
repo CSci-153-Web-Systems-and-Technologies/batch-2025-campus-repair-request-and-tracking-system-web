@@ -70,11 +70,29 @@ export default async function RequesterDashboard() {
     if (user) {
         const result = await supabase
             .from('requests')
-            .select('id, title, category, location, status, created_at')
+            .select(`
+                id, 
+                title, 
+                location, 
+                status, 
+                created_at,
+                request_categories(
+                    categories(name)
+                )
+            `)
             .eq('requester_id', user.id)
             .order('created_at', { ascending: false });
         
-        requests = result.data || [];
+        const formattedData = (result.data || []).map((req: any) => ({
+            id: req.id,
+            title: req.title,
+            location: req.location,
+            status: req.status,
+            created_at: req.created_at,
+            category: req.request_categories?.[0]?.categories?.name || 'Uncategorized'
+        }));
+        
+        requests = formattedData;
         requestsError = result.error;
     }
     

@@ -33,12 +33,8 @@ export default function RequestDetailsPage({
         <RequestDetails requestId={requestId} />
       </div>
 
-      <div className="flex items-center pb-10 justify-center">
-        <ManagementActions requestId={requestId} />
-      </div>
-
       <div className="flex items-center justify-center">
-        <CommunicationUpdates />
+        <CommunicationUpdates requestId={requestId} role="requester" />
       </div>
     </div>
   );

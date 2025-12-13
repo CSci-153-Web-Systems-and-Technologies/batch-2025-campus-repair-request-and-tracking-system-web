@@ -14,8 +14,9 @@ interface RequestRowProps {
 }
 
 const statusLabels: { [key: string]: string } = {
-  "submitted": "Submitted",
-  "under_review": "Under Review",
+  "pending": "Pending",
+  "submitted": "Pending",
+  "under_review": "Pending",
   "in_progress": "In Progress",
   "completed": "Completed",
   "cancelled": "Cancelled",
@@ -35,12 +36,12 @@ const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
     switch (status.toLowerCase()) {
       case 'completed':
         return { bg: 'bg-green-100', text: 'text-green-600', icon: '✅' };
+      case 'pending':
       case 'submitted':
-        return { bg: 'bg-gray-100', text: 'text-gray-600', icon: '📝' };
       case 'under_review':
-        return { bg: 'bg-yellow-100', text: 'text-orange-600', icon: '👀' };
+        return { bg: 'bg-amber-100', text: 'text-orange-500', icon: '⏳' };
       case 'in_progress':
-        return { bg: 'bg-sky-100', text: 'text-sky-600', icon: '🔨' };
+        return { bg: 'bg-blue-100', text: 'text-blue-600', icon: '🔨' };
       case 'cancelled':
         return { bg: 'bg-red-100', text: 'text-red-600', icon: '❌' };
       default:
