@@ -13,6 +13,14 @@ interface RequestRowProps {
   };
 }
 
+const statusLabels: { [key: string]: string } = {
+  "submitted": "Submitted",
+  "under_review": "Under Review",
+  "in_progress": "In Progress",
+  "completed": "Completed",
+  "cancelled": "Cancelled",
+};
+
 const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
   const router = useRouter();
   const formatDate = (dateString: string) => {
@@ -84,7 +92,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ request }) => {
         >
           <div className="flex justify-center items-center gap-1">
             <div className={`${statusStyle.text} text-xs font-semibold font-electrolize`}>
-              {statusStyle.icon} {request.status}
+              {statusStyle.icon} {statusLabels[request.status.toLowerCase()] || request.status}
             </div>
           </div>
         </div>
