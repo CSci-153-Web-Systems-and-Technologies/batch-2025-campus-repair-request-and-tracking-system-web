@@ -1,23 +1,74 @@
 import React from 'react';
 import Header from '@/components/Header';
 import StatusCard from '@/components/StatusCard';
-import { statusCardsData } from '@/data/statusCards';
 import SubmitRequestCard from '@/components/SubmitRequestCard';
 import RequestsContainer from '@/components/RequestsContainer';
-import DarkModeToggle from '@/components/DarkModeToggle';
+import { createClient } from '@/utils/supabase/server';
 
-export default function RequesterDashboard() {
+export default async function RequesterDashboard() {
+    const supabase = createClient();
     
-    const handleSubmitRequest = () => {
-        // Server component cannot use client hooks
+    // Get current user
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+    
+    let statusCounts = {
+        total: 0,
+        pending: 0,
+        inProgress: 0,
+        completed: 0,
     };
+    
+    if (user) {
+        // Fetch all requests for the current user
+        const { data: requests, error } = await supabase
+            .from('requests')
+            .select('status')
+            .eq('requester_id', user.id);
+        
+        if (requests) {
+            statusCounts.total = requests.length;
+            statusCounts.pending = requests.filter((r) => r.status === 'under_review').length;
+            statusCounts.inProgress = requests.filter((r) => r.status === 'in_progress').length;
+            statusCounts.completed = requests.filter((r) => r.status === 'completed').length;
+        }
+    }
+    
+    const statusCardsData = [
+        {
+            id: 1,
+            count: statusCounts.total,
+            status: 'Total Request',
+            iconSrc: '/images/request.png',
+            iconAlt: 'Total Request',
+        },
+        {
+            id: 2,
+            count: statusCounts.pending,
+            status: 'Pending',
+            iconSrc: '/images/pending.png',
+            iconAlt: 'Pending Request',
+        },
+        {
+            id: 3,
+            count: statusCounts.inProgress,
+            status: 'In Progress',
+            iconSrc: '/images/inprogress.png',
+            iconAlt: 'In Progress Request',
+        },
+        {
+            id: 4,
+            count: statusCounts.completed,
+            status: 'Completed',
+            iconSrc: '/images/completed.png',
+            iconAlt: 'Completed Request',
+        },
+    ];
     
     return (
         <div>        
-        <div className="flex items-center justify-between px-8 pt-6">
-          <Header userName="Angielyn" />
-          <DarkModeToggle />
-        </div>
+        <Header userName={user?.user_metadata?.full_name || 'User'} />
         <div className="min-h-screen p-8 pt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 ml-14 mr-14">
             {statusCardsData.map((card) => (
